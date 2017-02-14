@@ -1,0 +1,5 @@
+monetdb-gsl (1.0-1) unstable; urgency=low
+
+  * Separated gsl extension out from MonetDB.
+
+ -- Sjoerd Mullender <sjoerd@acm.org>  Tue, 14 Feb 2017 15:53:46 +0100
