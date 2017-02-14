@@ -1,0 +1,5 @@
+syntax: glob
+
+*.o
+*.so
+MonetDB-gsl-*.tar.bz2

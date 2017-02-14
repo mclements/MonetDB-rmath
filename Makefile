@@ -1,3 +1,6 @@
+name = MonetDB-gsl
+version = `sed -n 's/^Version:[ \t]*\(.*\)/\1/p' MonetDB-gsl.spec`
+
 LIBDIR = `pkg-config --variable=libdir monetdb5`
 
 CC = cc
@@ -17,6 +20,10 @@ clean:
 	rm -f *.o *.so
 
 install: lib_gsl.so
-	cp gsl.mal lib_reverse.so $(DESTDIR)$(LIBDIR)/monetdb5
-	cp 46_gsl.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
-	cp 73_gsl.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
+	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/{autoload,createdb}
+	cp gsl.mal lib_gsl.so $(DESTDIR)$(LIBDIR)/monetdb5
+	cp ??_gsl.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
+	cp ??_gsl.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
+
+dist:
+	tar -c -j -f $(name)-$(version).tar.bz2 --transform "s,^,$(name)-$(version)/," `hg files -X .hgtags`
