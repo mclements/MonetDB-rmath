@@ -12,6 +12,8 @@ Standards-Version: 3.8.0
 Package: monetdb-gsl
 Architecture: any
 Depends: monetdb5-sql
+Replaces: libmonetdb5-server-gsl
+Conflicts: libmonetdb5-server-gsl
 Description: MonetDB5 SQL interface to the gsl library
  MonetDB is a database management system that is developed from a
  main-memory perspective with use of a fully decomposed storage model,
