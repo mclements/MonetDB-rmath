@@ -20,7 +20,7 @@ clean:
 	rm -f *.o *.so
 
 install: lib_gsl.so
-	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/{autoload,createdb}
+	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/autoload $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp gsl.mal lib_gsl.so $(DESTDIR)$(LIBDIR)/monetdb5
 	cp ??_gsl.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp ??_gsl.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
