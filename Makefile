@@ -5,8 +5,8 @@ LIBDIR = `pkg-config --variable=libdir monetdb5`
 
 CC = cc
 
-CFLAGS = `pkg-config --cflags monetdb5`
-LDFLAGS = `pkg-config --libs monetdb5`
+CFLAGS = `pkg-config --cflags monetdb5` `pkg-config --cflags gsl`
+LDFLAGS = `pkg-config --libs monetdb5` `pkg-config --libs gsl`
 
 all: lib_gsl.so
 
