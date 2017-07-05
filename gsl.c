@@ -51,7 +51,6 @@ gsl_bat_chisqprob_cst(bat * retval, bat chi2, dbl datapoints)
 	BATiter bi;
 	BUN p,q;
 	dbl r;
-	char *msg = NULL;
 
 	if (datapoints == dbl_nil) {
 		throw(MAL, "GSLbat_chisqprob_cst", "Parameter datapoints should not be nil");
@@ -70,15 +69,22 @@ gsl_bat_chisqprob_cst(bat * retval, bat chi2, dbl datapoints)
 	}
 	BATloop(b,p,q) {
 		dbl d = *(dbl*)BUNtail(bi,p);
-		if ((d == dbl_nil) || (d < 0))
+		if ((d == dbl_nil) || (d < 0)) {
+			BBPunfix(b->batCacheid);
+			BBPreclaim(bn);
 			throw(MAL, "gsl.chi2prob", "Wrong value for chi2");
+		}
 		r = gsl_cdf_chisq_Q(d, datapoints);
-		BUNappend(bn, &r, FALSE);
+		if (BUNappend(bn, &r, FALSE) != GDK_SUCCEED) {
+			BBPunfix(b->batCacheid);
+			BBPreclaim(bn);
+			throw(MAL, "gsl.chi2prob", GDK_EXCEPTION);
+		}
 	}
 	*retval = bn->batCacheid;
 	BBPkeepref(bn->batCacheid);
 	BBPunfix(b->batCacheid);
-	return msg;
+	return MAL_SUCCEED;
 }
 
 static str
@@ -88,16 +94,15 @@ gsl_cst_chisqprob_bat(bat * retval, dbl chi2, bat datapoints)
 	BATiter bi;
 	BUN p,q;
 	dbl r;
-	char *msg = NULL;
 
-	if( (b = BATdescriptor(datapoints)) == NULL) {
-		throw(MAL, "chisqprob", "Cannot access descriptor");
-	}
 	if (chi2 == dbl_nil) {
 		throw(MAL, "GSLbat_chisqprob_cst", "Parameter chi2 should not be nil");
 	}
 	if (chi2 < 0)
 		throw(MAL, "gsl.chi2prob", "Wrong value for chi2");
+	if( (b = BATdescriptor(datapoints)) == NULL) {
+		throw(MAL, "chisqprob", "Cannot access descriptor");
+	}
 	bi = bat_iterator(b);
 	bn = COLnew(b->hseqbase, TYPE_dbl, BATcount(b), TRANSIENT);
 	if( bn == NULL) {
@@ -107,14 +112,21 @@ gsl_cst_chisqprob_bat(bat * retval, dbl chi2, bat datapoints)
 	BATloop(b,p,q) {
 		dbl datapoints = *(dbl*)BUNtail(bi,p);
 
-		if ((datapoints == dbl_nil) || (datapoints < 0))
+		if ((datapoints == dbl_nil) || (datapoints < 0)) {
+			BBPunfix(b->batCacheid);
+			BBPreclaim(bn);
 			throw(MAL, "gsl.chi2prob", "Wrong value for datapoints");
+		}
 		r = gsl_cdf_chisq_Q(chi2, datapoints);
-		BUNappend(bn, &r, FALSE);
+		if (BUNappend(bn, &r, FALSE) != GDK_SUCCEED) {
+			BBPunfix(b->batCacheid);
+			BBPreclaim(bn);
+			throw(MAL, "gsl.chi2prob", GDK_EXCEPTION);
+		}
 	}
 	BBPkeepref( *retval = bn->batCacheid);
 	BBPunfix(b->batCacheid);
-	return msg;
+	return MAL_SUCCEED;
 }
 
 static str
@@ -122,7 +134,6 @@ gsl_bat_chisqprob_bat(bat * retval, bat chi2, bat datapoints)
 {
 	BAT *b, *c, *bn;
 	dbl r, *chi2p, *datapointsp;
-	char *msg = NULL;
 	size_t cnt = 0, i;
 
 	if( (b = BATdescriptor(chi2)) == NULL) {
@@ -139,17 +150,30 @@ gsl_bat_chisqprob_bat(bat * retval, bat chi2, bat datapoints)
 	chi2p = (dbl*)Tloc(b, 0);
 	datapointsp = (dbl*)Tloc(c, 0);
 	for(i = 0; i<cnt; i++) { 
-		if ((chi2p[i] == dbl_nil) || (chi2p[i] < 0))
+		if ((chi2p[i] == dbl_nil) || (chi2p[i] < 0)) {
+			BBPunfix(b->batCacheid);
+			BBPunfix(c->batCacheid);
+			BBPreclaim(bn);
 			throw(MAL, "gsl.chi2prob", "Wrong value for chi2");
-		if ((datapointsp[i] == dbl_nil) || (datapointsp[i] < 0))
+		}
+		if ((datapointsp[i] == dbl_nil) || (datapointsp[i] < 0)) {
+			BBPunfix(b->batCacheid);
+			BBPunfix(c->batCacheid);
+			BBPreclaim(bn);
 			throw(MAL, "gsl.chi2prob", "Wrong value for datapoints");
+		}
 		r = gsl_cdf_chisq_Q(chi2p[i], datapointsp[i]);
-		BUNappend(bn, &r, FALSE);
+		if (BUNappend(bn, &r, FALSE) != GDK_SUCCEED) {
+			BBPunfix(b->batCacheid);
+			BBPunfix(c->batCacheid);
+			BBPreclaim(bn);
+			throw(MAL, "gsl.chi2prob", GDK_EXCEPTION);
+		}
 	}
 	BBPkeepref( *retval = bn->batCacheid);
 	BBPunfix(b->batCacheid);
 	BBPunfix(c->batCacheid);
-	return msg;
+	return MAL_SUCCEED;
 }
 
 str
