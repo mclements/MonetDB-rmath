@@ -1,5 +1,5 @@
 Name:		MonetDB-gsl
-Version:	1.0
+Version:	1.1
 Release:	1%{?dist}
 Summary:	MonetDB5 SQL interface to the gsl library
 
@@ -43,5 +43,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/monetdb5/lib_gsl.so
 
 %changelog
+* Wed Jul  5 2017 Sjoerd Mullender <sjoerd@acm.org> - 1.1-1
+- Error checking.
+
 * Tue Feb 14 2017 Sjoerd Mullender <sjoerd@acm.org>
 - Separated gsl extension out from MonetDB.
