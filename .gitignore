@@ -1,0 +1,3 @@
+lib_rmath.la
+lib_rmath.so
+rmath.o
