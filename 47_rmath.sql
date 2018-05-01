@@ -5,8 +5,10 @@
 -- Copyright 1997 - July 2008 CWI, August 2008 - 2017 MonetDB B.V.
 
 -- (co) Arjen de Rijke, Bart Scheers
--- Use statistical functions from gsl library
+-- Use statistical functions from rmath library
 
 -- Calculate Chi squared probability
-create function sys.chi2prob(chi2 double, datapoints double)
-returns double external name gsl."chi2prob";
+create function sys.pchisq(chi2 double, datapoints double)
+returns double external name rmath."pchisq";
+
+

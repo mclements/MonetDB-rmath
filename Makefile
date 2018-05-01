@@ -1,29 +1,29 @@
-name = MonetDB-gsl
-version = `sed -n 's/^Version:[ \t]*\(.*\)/\1/p' MonetDB-gsl.spec`
+name = MonetDB-rmath
+version = `sed -n 's/^Version:[ \t]*\(.*\)/\1/p' MonetDB-rmath.spec`
 
 LIBDIR = `pkg-config --variable=libdir monetdb5`
 
 CC = cc
 
-CFLAGS = `pkg-config --cflags monetdb5` `pkg-config --cflags gsl`
-LDFLAGS = `pkg-config --libs monetdb5` `pkg-config --libs gsl`
+CFLAGS = `pkg-config --cflags monetdb5` `pkg-config --cflags libRmath`
+LDFLAGS = `pkg-config --libs monetdb5` `pkg-config --libs libRmath`
 
-all: lib_gsl.so
+all: lib_rmath.so
 
-lib_gsl.so: gsl.o
-	$(CC) -fPIC -DPIC -o lib_gsl.so -shared gsl.o $(LDFLAGS) -Wl,-soname -Wl,lib_gsl.so
+lib_rmath.so: rmath.o
+	$(CC) -fPIC -DPIC -o lib_rmath.so -shared rmath.o $(LDFLAGS) -Wl,-soname -Wl,lib_rmath.so
 
-gsl.o: gsl.c
-	$(CC) -fPIC -DPIC $(CFLAGS) -c gsl.c
+rmath.o: rmath.c
+	$(CC) -fPIC -DPIC $(CFLAGS) -c rmath.c
 
 clean:
 	rm -f *.o *.so
 
-install: lib_gsl.so
+install: lib_rmath.so
 	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/autoload $(DESTDIR)$(LIBDIR)/monetdb5/createdb
-	cp gsl.mal lib_gsl.so $(DESTDIR)$(LIBDIR)/monetdb5
-	cp ??_gsl.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
-	cp ??_gsl.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
+	cp rmath.mal lib_rmath.so $(DESTDIR)$(LIBDIR)/monetdb5
+	cp ??_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
+	cp ??_rmath.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
 
 dist:
 	tar -c -j -f $(name)-$(version).tar.bz2 --transform "s,^,$(name)-$(version)/," `hg files -X .hgtags`
