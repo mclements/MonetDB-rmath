@@ -18,7 +18,7 @@
 #include "mal_exception.h"
 
 #define MATHLIB_STANDALONE
-#include <Rmath.h>
+#include "Rmath.h"
 
 #ifdef WIN32
 #define rmath_export extern __declspec(dllexport)
