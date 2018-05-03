@@ -1,12 +1,14 @@
 name = MonetDB-rmath
 version = `sed -n 's/^Version:[ \t]*\(.*\)/\1/p' MonetDB-rmath.spec`
 
-LIBDIR = `pkg-config --variable=libdir monetdb5`
+LIBDIR = $(shell pkg-config --variable=libdir monetdb5)
 
 CC = cc
 
-CFLAGS = `pkg-config --cflags monetdb5` `pkg-config --cflags libRmath`
-LDFLAGS = `pkg-config --libs monetdb5` `pkg-config --libs libRmath`
+CFLAGS += $(shell pkg-config --cflags monetdb5)
+CFLAGS += $(shell pkg-config --cflags libRmath)
+LDFLAGS += $(shell pkg-config --libs monetdb5)
+LDFLAGS += $(shell pkg-config --libs libRmath)
 
 all: lib_rmath.so
 
