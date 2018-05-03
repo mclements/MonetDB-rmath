@@ -5,20 +5,22 @@
 # Copyright 1997 - July 2008 CWI, August 2008 - 2017 MonetDB B.V.
 
 module rmath;
-module batrmath;
 
-command rmath.pchisq(d:dbl,i:dbl):dbl
+command pchisq(d:dbl,i:dbl):dbl
 address rmathpchisq
 comment "Chi Squared probability";
 
-command batrmath.pchisq(d:bat[:dbl],i:dbl):bat[:dbl]
+
+module batrmath;
+
+command pchisq(d:bat[:dbl],i:dbl):bat[:dbl]
 address rmathbat_pchisq_cst
 comment "Chi Squared probability";
 
-command batrmath.pchisq(d:dbl,i:bat[:dbl]):bat[:dbl]
+command pchisq(d:dbl,i:bat[:dbl]):bat[:dbl]
 address rmathcst_pchisq_bat
 comment "Chi Squared probability";
 
-command batrmath.pchisq(d:bat[:dbl],i:bat[:dbl]):bat[:dbl]
+command pchisq(d:bat[:dbl],i:bat[:dbl]):bat[:dbl]
 address rmathbat_pchisq_bat
 comment "Chi Squared probability";
