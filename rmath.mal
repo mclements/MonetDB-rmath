@@ -6,21 +6,63 @@
 
 module rmath;
 
-command pchisq(d:dbl,i:dbl):dbl
-address rmathpchisq
-comment "Chi Squared probability";
+command pchisq(q:dbl,df:dbl,lower:int,log:int):dbl
+address rmath_pchisq
+comment "Chi Squared CDF";
+
+command qchisq(p:dbl,df:dbl,lower:int,log:int):dbl
+address rmath_qchisq
+comment "Chi Squared quantile function";
+
+command dchisq(x:dbl,df:dbl,log:int):dbl
+address rmath_dchisq
+comment "Chi Squared PDF";
 
 
-module batrmath;
+command pnorm(q:dbl,mean:dbl,sd:dbl,lower:int,log:int):dbl
+address rmath_pnorm
+comment "Normal CDF";
 
-command pchisq(d:bat[:dbl],i:dbl):bat[:dbl]
-address rmathbat_pchisq_cst
-comment "Chi Squared probability";
+command qnorm(p:dbl,mean:dbl,sd:dbl,lower:int,log:int):dbl
+address rmath_qnorm
+comment "Normal quantile function";
 
-command pchisq(d:dbl,i:bat[:dbl]):bat[:dbl]
-address rmathcst_pchisq_bat
-comment "Chi Squared probability";
+command dnorm(q:dbl,mean:dbl,sd:dbl,log:int):dbl
+address rmath_dnorm
+comment "Normal PDF";
 
-command pchisq(d:bat[:dbl],i:bat[:dbl]):bat[:dbl]
-address rmathbat_pchisq_bat
-comment "Chi Squared probability";
+
+command pgamma(q:dbl,shape:dbl,scale:dbl,lower:int,log:int):dbl
+address rmath_pgamma
+comment "Gamma CDF";
+
+command qgamma(p:dbl,shape:dbl,scale:dbl,lower:int,log:int):dbl
+address rmath_qgamma
+comment "Gamma quantile function";
+
+command dgamma(x:dbl,shape:dbl,scale:dbl,log:int):dbl
+address rmath_dgamma
+comment "Gamma PDF";
+
+# function poissonci(x:int, idx:int, conflevel:dbl):dbl
+# alpha:dbl := (1:dbl - conflevel);
+# alpha := alpha / 2:dbl;
+# out:dbl := 0:dbl;
+# barrier zeroleft := (x==0)*(idx==1);
+# return out;
+# exit zeroleft;
+# barrier nonzeroleft := (x>0)*(idx==1);
+# return rmath.qgamma(alpha, x, 1:dbl);
+# exit nonzeroleft;
+# barrier right := (idx==2);
+# return rmath.gamma(1:dbl - alpha, x+1, 1:dbl);
+# exit right;
+# end poissonci;
+
+
+# module batrmath;
+
+# command pchisq(d:bat[:dbl],i:bat[:dbl]):bat[:dbl]
+# address rmathbat_pchisq_bat
+# comment "Chi Squared probability";
+

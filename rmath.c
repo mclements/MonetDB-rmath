@@ -26,175 +26,133 @@
 #define rmath_export extern
 #endif
 
-rmath_export str rmathpchisq(dbl *retval, dbl *chi2, dbl *datapoints);
-rmath_export str rmathbat_pchisq_cst(bat *retval, bat *chi2, dbl *datapoints);
-rmath_export str rmathcst_pchisq_bat(bat *retval, dbl *chi2, bat *datapoints);
-rmath_export str rmathbat_pchisq_bat(bat *retval, bat *chi2, bat *datapoints);
 
-static str
-rmath_pchisq(dbl *retval, dbl chi2, dbl datapoints)
-{
-	*retval = dbl_nil;
-	if (chi2 == dbl_nil || chi2 < 0)
-		throw(MAL, "rmath.pchisq", "Wrong value for chi2");
-	if (datapoints == dbl_nil || datapoints < 0)
-		throw(MAL, "rmath.pchisq", "Wrong value for datapoints");
-	*retval = pchisq(chi2, datapoints, 1, 0);
-	return MAL_SUCCEED;
-}
+#define DIST2FUNCTION(NAME,ARG1,ARG2)					\
+  static str								\
+  rmathp ## NAME(dbl *retval, dbl q, dbl ARG1, dbl ARG2, int lower, int log)	\
+  {									\
+    *retval = dbl_nil;							\
+    if (q == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for q" );			\
+    if (ARG1 == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG1);		\
+    if (ARG2 == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG2);		\
+    if (lower == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for lower");		\
+    if (log == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for log");		\
+    *retval = p ## NAME(q, ARG1, ARG2, lower, log);			\
+    return MAL_SUCCEED;							\
+  }									\
+  static str								\
+  rmathq ## NAME(dbl *retval, dbl p, dbl ARG1, dbl ARG2, int lower, int log)	\
+  {									\
+    *retval = dbl_nil;							\
+    if (p == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for p" );			\
+    if (ARG1 == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG1);		\
+    if (ARG2 == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG2);		\
+    if (lower == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for lower");		\
+    if (log == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for log");		\
+    *retval = q ## NAME(p, ARG1, ARG2, lower, log);			\
+    return MAL_SUCCEED;							\
+  }									\
+  static str								\
+  rmathd ## NAME(dbl *retval, dbl x, dbl ARG1, dbl ARG2, int log)	\
+  {									\
+    *retval = dbl_nil;							\
+    if (x == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for x" );			\
+    if (ARG1 == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG1);		\
+    if (ARG2 == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG2);		\
+    if (log == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for log");		\
+    *retval = d ## NAME(x, ARG1, ARG2, log);				\
+    return MAL_SUCCEED;							\
+  }									\
+  rmath_export str							\
+  rmath_p ## NAME(dbl *retval, dbl *q, dbl *ARG1, dbl *ARG2, int *lower, int *log) \
+  {									\
+    return rmathp ## NAME(retval, *q, *ARG1, *ARG2, *lower, *log);	\
+  }									\
+  rmath_export str							\
+  rmath_q ## NAME(dbl *retval, dbl *p, dbl *ARG1, dbl *ARG2, int *lower, int *log) \
+  {									\
+    return rmathq ## NAME(retval, *p, *ARG1, *ARG2, *lower, *log);	\
+  }									\
+  rmath_export str							\
+  rmath_d ## NAME(dbl *retval, dbl *x, dbl *ARG1, dbl *ARG2, int *log) \
+  {									\
+    return rmathd ## NAME(retval, *x, *ARG1, *ARG2, *log);		\
+  }
+DIST2FUNCTION(norm,mean,sd)
+DIST2FUNCTION(gamma,shape,scale)
 
-static str
-rmath_bat_pchisq_cst(bat *retval, bat chi2, dbl datapoints)
-{
-	BAT *b, *bn;
-	BATiter bi;
-	BUN p, q;
-	dbl r;
+#define DIST1FUNCTION(NAME,ARG)						\
+  static str								\
+  rmathp ## NAME(dbl *retval, dbl q, dbl ARG, int lower, int log)	\
+  {									\
+    *retval = dbl_nil;							\
+    if (q == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for q" );			\
+    if (ARG == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG);		\
+    if (lower == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for lower");		\
+    if (log == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for log");		\
+    *retval = p ## NAME(q, ARG, lower, log);				\
+    return MAL_SUCCEED;							\
+  }									\
+  static str								\
+  rmathq ## NAME(dbl *retval, dbl p, dbl ARG, int lower, int log)	\
+  {									\
+    *retval = dbl_nil;							\
+    if (p == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for p" );			\
+    if (ARG == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG);		\
+    if (lower == dbl_nil)						\
+      throw(MAL, "rmath." #NAME, "Wrong value for lower");		\
+    if (log == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for log");		\
+    *retval = q ## NAME(p, ARG, lower, log);				\
+    return MAL_SUCCEED;							\
+  }									\
+  static str								\
+  rmathd ## NAME(dbl *retval, dbl x, dbl ARG, int log)			\
+  {									\
+    *retval = dbl_nil;							\
+    if (x == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for x" );			\
+    if (ARG == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for " #ARG);		\
+    if (log == dbl_nil)							\
+      throw(MAL, "rmath." #NAME, "Wrong value for log");		\
+    *retval = d ## NAME(x, ARG, log);					\
+    return MAL_SUCCEED;							\
+  }									\
+  rmath_export str							\
+  rmath_p ## NAME(dbl *retval, dbl *q, dbl *ARG, int *lower, int *log)	\
+  {									\
+    return rmathp ## NAME(retval, *q, *ARG, *lower, *log);		\
+  }									\
+  rmath_export str							\
+  rmath_q ## NAME(dbl *retval, dbl *p, dbl *ARG, int *lower, int *log)	\
+  {									\
+    return rmathq ## NAME(retval, *p, *ARG, *lower, *log);		\
+  }									\
+  rmath_export str							\
+  rmath_d ## NAME(dbl *retval, dbl *x, dbl *ARG, int *log)		\
+  {									\
+    return rmathd ## NAME(retval, *x, *ARG, *log);			\
+  }
+DIST1FUNCTION(chisq,df)
 
-	if (datapoints == dbl_nil)
-		throw(MAL, "rmathbat_pchisq_cst", "Parameter datapoints should not be nil");
-	if (datapoints < 0)
-		throw(MAL, "rmath.pchisq", "Wrong value for datapoints");
-
-	if ((b = BATdescriptor(chi2)) == NULL) {
-		throw(MAL, "pchisq", RUNTIME_OBJECT_MISSING);
-	}
-	bi = bat_iterator(b);
-	bn = COLnew(b->hseqbase, TYPE_dbl, BATcount(b), TRANSIENT);
-	if (bn == NULL) {
-		BBPunfix(b->batCacheid);
-		throw(MAL, "rmath.pchisq", MAL_MALLOC_FAIL);
-	}
-	BATloop(b, p, q) {
-		dbl d = *(dbl *) BUNtail(bi, p);
-		if (d == dbl_nil || d < 0) {
-			BBPunfix(b->batCacheid);
-			BBPreclaim(bn);
-			throw(MAL, "rmath.pchisq", "Wrong value for chi2");
-		}
-		r = pchisq(d, datapoints, 1, 0);
-		if (BUNappend(bn, &r, FALSE) != GDK_SUCCEED) {
-			BBPunfix(b->batCacheid);
-			BBPreclaim(bn);
-			throw(MAL, "rmath.pchisq", GDK_EXCEPTION);
-		}
-	}
-	*retval = bn->batCacheid;
-	BBPkeepref(bn->batCacheid);
-	BBPunfix(b->batCacheid);
-	return MAL_SUCCEED;
-}
-
-static str
-rmath_cst_pchisq_bat(bat *retval, dbl chi2, bat datapoints)
-{
-	BAT *b, *bn;
-	BATiter bi;
-	BUN p, q;
-	dbl r;
-
-	if (chi2 == dbl_nil)
-		throw(MAL, "rmathbat_pchisq_cst", "Parameter chi2 should not be nil");
-	if (chi2 < 0)
-		throw(MAL, "rmath.pchisq", "Wrong value for chi2");
-	if ((b = BATdescriptor(datapoints)) == NULL) {
-		throw(MAL, "pchisq", RUNTIME_OBJECT_MISSING);
-	}
-	bi = bat_iterator(b);
-	bn = COLnew(b->hseqbase, TYPE_dbl, BATcount(b), TRANSIENT);
-	if (bn == NULL) {
-		BBPunfix(b->batCacheid);
-		throw(MAL, "rmath.pchisq", MAL_MALLOC_FAIL);
-	}
-	BATloop(b, p, q) {
-		dbl datapoints = *(dbl *) BUNtail(bi, p);
-
-		if (datapoints == dbl_nil || datapoints < 0) {
-			BBPunfix(b->batCacheid);
-			BBPreclaim(bn);
-			throw(MAL, "rmath.pchisq", "Wrong value for datapoints");
-		}
-		r = pchisq(chi2, datapoints, 1, 0);
-		if (BUNappend(bn, &r, FALSE) != GDK_SUCCEED) {
-			BBPunfix(b->batCacheid);
-			BBPreclaim(bn);
-			throw(MAL, "rmath.pchisq", GDK_EXCEPTION);
-		}
-	}
-	BBPkeepref(*retval = bn->batCacheid);
-	BBPunfix(b->batCacheid);
-	return MAL_SUCCEED;
-}
-
-static str
-rmath_bat_pchisq_bat(bat *retval, bat chi2, bat datapoints)
-{
-	BAT *b, *c, *bn;
-	dbl r, *chi2p, *datapointsp;
-	size_t cnt = 0, i;
-
-	if ((b = BATdescriptor(chi2)) == NULL) {
-		throw(MAL, "pchisq", RUNTIME_OBJECT_MISSING);
-	}
-	if ((c = BATdescriptor(datapoints)) == NULL) {
-		BBPunfix(b->batCacheid);
-		throw(MAL, "pchisq", RUNTIME_OBJECT_MISSING);
-	}
-	bn = COLnew(b->hseqbase, TYPE_dbl, cnt = BATcount(b), TRANSIENT);
-	if (bn == NULL) {
-		BBPunfix(b->batCacheid);
-		BBPunfix(c->batCacheid);
-		throw(MAL, "rmath.pchisq", MAL_MALLOC_FAIL);
-	}
-	chi2p = (dbl *) Tloc(b, 0);
-	datapointsp = (dbl *) Tloc(c, 0);
-	for (i = 0; i < cnt; i++) {
-		if (chi2p[i] == dbl_nil || chi2p[i] < 0) {
-			BBPunfix(b->batCacheid);
-			BBPunfix(c->batCacheid);
-			BBPreclaim(bn);
-			throw(MAL, "rmath.pchisq", "Wrong value for chi2");
-		}
-		if (datapointsp[i] == dbl_nil || datapointsp[i] < 0) {
-			BBPunfix(b->batCacheid);
-			BBPunfix(c->batCacheid);
-			BBPreclaim(bn);
-			throw(MAL, "rmath.pchisq", "Wrong value for datapoints");
-		}
-		r = pchisq(chi2p[i], datapointsp[i], 1, 0);
-		if (BUNappend(bn, &r, FALSE) != GDK_SUCCEED) {
-			BBPunfix(b->batCacheid);
-			BBPunfix(c->batCacheid);
-			BBPreclaim(bn);
-			throw(MAL, "rmath.pchisq", GDK_EXCEPTION);
-		}
-	}
-	BBPkeepref(*retval = bn->batCacheid);
-	BBPunfix(b->batCacheid);
-	BBPunfix(c->batCacheid);
-	return MAL_SUCCEED;
-}
-
-str
-rmathpchisq(dbl *retval, dbl *chi2, dbl *datapoints)
-{
-	return rmath_pchisq(retval, *chi2, *datapoints);
-}
-
-str
-rmathbat_pchisq_cst(bat *retval, bat *chi2, dbl *datapoints)
-{
-	return rmath_bat_pchisq_cst(retval, *chi2, *datapoints);
-}
-
-str
-rmathcst_pchisq_bat(bat *retval, dbl *chi2, bat *datapoints)
-{
-	return rmath_cst_pchisq_bat(retval, *chi2, *datapoints);
-}
-
-str
-rmathbat_pchisq_bat(bat *retval, bat *chi2, bat *datapoints)
-{
-	return rmath_bat_pchisq_bat(retval, *chi2, *datapoints);
-}
