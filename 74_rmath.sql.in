@@ -26,6 +26,9 @@ returns double external name rmath."d$2";
 
 create function sys.d$2(x double, $3 double)
 returns double begin return d$2(x, $3, 0); end;
+
+create function sys.r$2($3 double)
+returns double begin return r$2($3); end;
 ')
 
 define(`DIST2FUNCTION',`-- $1 distribution
@@ -46,6 +49,9 @@ returns double external name rmath."d$2";
 
 create function sys.d$2(x double, $3 double, $4 double)
 returns double begin return d$2(x, $3, $4, 0); end;
+
+create function sys.r$2($3 double, $4 double)
+returns double begin return r$2($3,$4); end;
 ')
 
 define(`DIST3FUNCTION',`-- $1 distribution
@@ -66,6 +72,9 @@ returns double external name rmath."d$2";
 
 create function sys.d$2(x double, $3 double, $4 double, $5 double)
 returns double begin return d$2(x, $3, $4, $5, 0); end;
+
+create function sys.r$2($3 double, $4 double, $5 double)
+returns double begin return r$2($3,$4,$5); end;
 ')
 
 define(`FUNCTION0',`-- $1
@@ -130,6 +139,7 @@ DIST1FUNCTION(T,t,df)
 DIST2FUNCTION(Binomial,binom,size,prob)
 
 -- void	rmultinom(int, double*, int, int*);
+divert(`-1')
 
 DIST2FUNCTION(Cauchy,cauchy,location,scale)
 DIST1FUNCTION(Exponential,exp,rate)
