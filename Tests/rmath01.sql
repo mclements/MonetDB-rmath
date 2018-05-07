@@ -4,7 +4,7 @@ SELECT sys.pchisq(20.0, NULL);
 
 SELECT sys.pchisq(NULL, 5.0);
 
-SELECT sys.pchisq(-1, 5.0);
+SELECT sys.pchisq(-1, 5.0); -- there is currently no guard against out-of-range inputs
 
 SELECT sys.pchisq(20.0, 1.0);
 

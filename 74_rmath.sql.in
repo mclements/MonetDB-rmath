@@ -1,0 +1,225 @@
+-- This Source Code Form is subject to the terms of the Mozilla Public
+-- License, v. 2.0.  If a copy of the MPL was not distributed with this
+-- file, You can obtain one at http://mozilla.org/MPL/2.0/.
+--
+-- Copyright 1997 - July 2008 CWI, August 2008 - 2017 MonetDB B.V.
+
+-- (co) Arjen de Rijke, Bart Scheers
+-- Use statistical functions from rmath library
+
+divert(`-1')
+define(`DIST1FUNCTION',`-- $1 distribution
+create function sys.p$2(q double, $3 double, lower integer, log integer)
+returns double external name rmath."p$2";
+
+create function sys.p$2(q double, $3 double)
+returns double begin return p$2(q, $3, 1, 0); end;
+
+create function sys.q$2(p double, $3 double, lower integer, log integer)
+returns double external name rmath."q$2";
+
+create function sys.q$2(p double, $3 double)
+returns double begin return q$2(p, $3, 1, 0); end;
+
+create function sys.d$2(x double, $3 double, log integer)
+returns double external name rmath."d$2";
+
+create function sys.d$2(x double, $3 double)
+returns double begin return d$2(x, $3, 0); end;
+')
+
+define(`DIST2FUNCTION',`-- $1 distribution
+create function sys.p$2(q double, $3 double, $4 double, lower integer, log integer)
+returns double external name rmath."p$2";
+
+create function sys.p$2(q double, $3 double, $4 double)
+returns double begin return p$2(q, $3, $4, 1, 0); end;
+
+create function sys.q$2(p double, $3 double, $4 double, lower integer, log integer)
+returns double external name rmath."q$2";
+
+create function sys.q$2(p double, $3 double, $4 double)
+returns double begin return q$2(p, $3, $4, 1, 0); end;
+
+create function sys.d$2(x double, $3 double, $4 double, log integer)
+returns double external name rmath."d$2";
+
+create function sys.d$2(x double, $3 double, $4 double)
+returns double begin return d$2(x, $3, $4, 0); end;
+')
+
+define(`DIST3FUNCTION',`-- $1 distribution
+create function sys.p$2(q double, $3 double, $4 double, $5 double, lower integer, log integer)
+returns double external name rmath."p$2";
+
+create function sys.p$2(q double, $3 double, $4 double, $5 double)
+returns double begin return p$2(q, $3, $4, $5, 1, 0); end;
+
+create function sys.q$2(p double, $3 double, $4 double, $5 double, lower integer, log integer)
+returns double external name rmath."q$2";
+
+create function sys.q$2(p double, $3 double, $4 double, $5 double)
+returns double begin return q$2(p, $3, $4, $5, 1, 0); end;
+
+create function sys.d$2(x double, $3 double, $4 double, $5 double, log integer)
+returns double external name rmath."d$2";
+
+create function sys.d$2(x double, $3 double, $4 double, $5 double)
+returns double begin return d$2(x, $3, $4, $5, 0); end;
+')
+
+define(`FUNCTION0',`-- $1
+create function sys.$2()
+returns double external name rmath."$2";
+')
+define(`FUNCTION1',`-- $1
+create function sys.$2($4 $3)
+returns double external name rmath."$2";
+')
+define(`FUNCTION2',`-- $1
+create function sys.$2($4 $3, $6 $5)
+returns double external name rmath."$2";
+')
+define(`FUNCTION3',`-- $1
+create function sys.$2($4 $3, $6 $5, $8 $7)
+returns double external name rmath."$2";
+')
+define(`FUNCTION4',`-- $1
+create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9)
+returns double external name rmath."$2";
+')
+define(`FUNCTION5',`-- $1
+create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
+returns double external name rmath."$2";
+')
+define(`FUNCTION6',`-- $1
+create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
+returns double external name rmath."$2";
+')
+
+divert(`1')
+
+FUNCTION2(R_pow,R_pow,double,x,double,y)
+FUNCTION2(R_pow_di,R_pow_di,double,x,int,y)
+FUNCTION0(Normal random numbers,norm_rand)
+FUNCTION0(Uniform random numbers,unif_rand)
+FUNCTION0(Exponential random numbers,exp_rand)
+
+create function sys.set_seed(a integer, b integer)
+returns double external name rmath."set_seed";
+
+-- void	get_seed(unsigned int *, unsigned int *);
+
+DIST2FUNCTION(Normal,norm,mean,sd)
+DIST2FUNCTION(Uniform,unif,min,max)
+DIST2FUNCTION(Gamma,gamma,shape,scale)
+FUNCTION1(log1pmx,log1pmx,double,x)
+FUNCTION1(log1pexp,log1pexp,double,x)
+FUNCTION1(lgamma1p,lgamma1p,double,x)
+FUNCTION2(logspace_add,logspace_add,double,logx,double,logy)
+FUNCTION2(logspace_sub,logspace_sub,double,logx,double,logy)
+
+-- double  logspace_sum(const double *, int);
+
+DIST2FUNCTION(Beta,beta,shape1,shape2)
+DIST2FUNCTION(Log-normal,lnorm,meanlog,sdlog)
+DIST1FUNCTION(Chi-squared,chisq,df)
+DIST2FUNCTION(Non-central chi-squared,nchisq,df,ncp)
+DIST2FUNCTION(F,f,df1,df2)
+DIST1FUNCTION(T,t,df)
+DIST2FUNCTION(Binomial,binom,size,prob)
+
+-- void	rmultinom(int, double*, int, int*);
+
+DIST2FUNCTION(Cauchy,cauchy,location,scale)
+DIST1FUNCTION(Exponential,exp,rate)
+DIST1FUNCTION(Geometric,geom,prob)
+DIST3FUNCTION(Hypergeometric,hyper,m,n,k)
+
+DIST2FUNCTION(Negative Binomial,nbinom,size,prob)
+DIST1FUNCTION(Poisson,pois,lambda)
+
+DIST2FUNCTION(Weibull,weibull,shape,scale)
+DIST2FUNCTION(Logistic,logis,location,scale)
+
+-- # DIST3FUNCTION(nbeta,shape1,shape2,ncp)
+
+
+FUNCTION6(Non-central beta cumulative distribution function,pnbeta,double,q,double,shape1,double,shape2,double,ncp,int,lower,int,log)
+FUNCTION6(Non-central beta quantile function,qnbeta,double,p,double,shape1,double,shape2,double,ncp,int,lower,int,log)
+FUNCTION5(Non-central beta probability density function,dnbeta,double,x,double,shape1,double,shape2,double,ncp,int,log)
+
+-- # FUNCTION3(rnbeta,double,shape1,double,shape2,double,ncp)
+-- # DIST3FUNCTION(nf,df1,df2,ncp)
+
+FUNCTION6(Non-central F cumulative distribution function,pnf,double,q,double,df1,double,df2,double,ncp,int,lower,int,log)
+FUNCTION6(Non-central F quantile function,qnf,double,p,double,df1,double,df2,double,ncp,int,lower,int,log)
+FUNCTION5(Non-central F probability density function,dnf,double,x,double,df1,double,df2,double,ncp,int,log)
+-- # DIST2FUNCTION(nt,df,ncp)
+FUNCTION5(Non-central Student t cumulative distribution function,pnt,double,q,double,df,double,ncp,int,lower,int,log)
+FUNCTION5(Non-central Student t quantile function,qnt,double,p,double,df,double,ncp,int,lower,int,log)
+FUNCTION4(Non-central Student t probability density function,dnt,double,x,double,df,double,ncp,int,log)
+FUNCTION6(Studentised rangecumulative distribution function,ptukey,double,q,double,nmeans,double,df,double,nranges,int,lower,int,log)
+FUNCTION6(Studentised range quantile function,qtukey,double,p,double,nmeans,double,df,double,nranges,int,lower,int,log)
+DIST2FUNCTION(Wilcoxon rank sum,wilcox, m, n)
+DIST1FUNCTION(Wilcoxon signed rank,signrank,n)
+FUNCTION1(gammafn,gammafn,double,x)
+FUNCTION1(lgammafn,lgammafn,double,x)
+
+-- double  lgammafn_sign(double, int*);
+-- void    dpsifn(double, int, int, int, double*, int*, int*);
+
+FUNCTION2(psigamma,psigamma,double,x,double,y)
+FUNCTION1(digamma,digamma,double,x)
+FUNCTION1(trigamma,trigamma,double,x)
+FUNCTION1(tetragamma,tetragamma,double,x)
+FUNCTION1(pentagamma,pentagamma,double,x)
+FUNCTION2(beta,beta,double,x,double,y)
+FUNCTION2(lbeta,lbeta,double,x,double,y)
+FUNCTION2(choose,choose,double,n,double,k)
+FUNCTION2(lchoose,lchoose,double,n,double,k)
+FUNCTION3(bessel_i,bessel_i,double,x,double,nu,double,scaled)
+FUNCTION2(bessel_j,bessel_j,double,x,double,nu)
+FUNCTION3(bessel_k,bessel_k,double,x,double,nu,double,scaled)
+FUNCTION2(bessel_y,bessel_y,double,x,double,nu)
+
+-- double	bessel_i_ex(double, double, double, double *);
+-- double	bessel_j_ex(double, double, double *);
+-- double	bessel_k_ex(double, double, double, double *);
+-- double	bessel_y_ex(double, double, double *);
+-- # FUNCTION2(pythag,double,x,double,y)
+-- int	imax2(int, int);
+-- int	imin2(int, int);
+
+FUNCTION2(fmax2,fmax2,double,x,double,y)
+FUNCTION2(fmin2,fmin2,double,x,double,y)
+-- # FUNCTION1(sign,sign,double,x)
+FUNCTION2(fprec,fprec,double,x,double,y)
+FUNCTION2(fround,fround,double,x,double,y)
+FUNCTION2(fsign,fsign,double,x,double,y)
+FUNCTION1(ftrunc,ftrunc,double,x)
+
+-- # FUNCTION1(log1pmx,double,x) -- repeated
+-- # FUNCTION1(lgamma1p,double,x) -- repeated
+-- double cospi(double);
+-- double sinpi(double);
+-- double tanpi(double);
+-- rmath_export double NA_REAL;
+-- rmath_export double R_PosInf;
+-- rmath_export double R_NegInf;
+-- rmath_export int N01_kind;
+
+divert(`1')
+
+create function sys.poissonci(x integer, idx integer, conflevel double)
+       returns double
+       begin
+       declare alpha double;
+       set alpha = (1.0-conflevel)/2.0;
+       if (x=0 and idx=1) then return 0.0;
+       elseif (idx=1) then return qgamma(alpha, cast(x as double), 1.0);
+       else return qgamma(1.0-alpha,cast(1+x as double),1.0);
+       end if;
+end;
+create function sys.poissonci(x integer, idx integer)
+returns double begin return poissonci(x,idx,0.95); end;

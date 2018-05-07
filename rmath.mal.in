@@ -1,0 +1,227 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0.  If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+# Copyright 1997 - July 2008 CWI, August 2008 - 2017 MonetDB B.V.
+# Copyright 2018 Mark Clements
+
+module rmath;
+divert(`-1')
+
+define(`DIST1FUNCTION',`# $1 distribution
+command p$2(q:dbl,$3:dbl,lower:int,log:int):dbl
+address rmath_p$2
+comment "$1 cumulative density function";
+
+command q$2(p:dbl,$3:dbl,lower:int,log:int):dbl
+address rmath_q$2
+comment "$1 quantile function";
+
+command d$2(x:dbl,$3:dbl,log:int):dbl
+address rmath_d$2
+comment "$1 probability density function";
+
+command r$2($3:dbl):dbl
+address rmath_r$2
+comment "$1 random numbers";
+')
+
+define(`DIST2FUNCTION',`# $1 distribution
+command p$2(q:dbl,$3:dbl,$4:dbl,lower:int,log:int):dbl
+address rmath_p$2
+comment "$1 cumulative distribution function";
+
+command q$2(p:dbl,$3:dbl,$4:dbl,lower:int,log:int):dbl
+address rmath_q$2
+comment "$1 quantile function";
+
+command d$2(x:dbl,$3:dbl,$4:dbl,log:int):dbl
+address rmath_d$2
+comment "$1 probability density function";
+
+command r$2($3:dbl,$4:dbl):dbl
+address rmath_r$2
+comment "$1 random numbers";
+')
+
+define(`DIST3FUNCTION',`# $1 distribution
+command p$2(q:dbl,$3:dbl,$4:dbl,$5:dbl,lower:int,log:int):dbl
+address rmath_p$2
+comment "$1 cumulative distribution function";
+
+command q$2(p:dbl,$3:dbl,$4:dbl,$5:dbl,lower:int,log:int):dbl
+address rmath_q$2
+comment "$1 quantile function";
+
+command d$2(x:dbl,$3:dbl,$4:dbl,$5:dbl,log:int):dbl
+address rmath_d$2
+comment "$1 probability density function";
+
+command r$2($3:dbl,$4:dbl,$5:dbl):dbl
+address rmath_r$2
+comment "$1 random numbers";
+')
+
+define(`FUNCTION0',`command $2():dbl
+address rmath_$2
+comment "$1";
+')
+define(`FUNCTION1',`command $2($4:$3):dbl
+address rmath_$2
+comment "$1";
+')
+define(`FUNCTION2',`command $2($4:$3,$6:$5):dbl
+address rmath_$2
+comment "$1";
+')
+define(`FUNCTION3',`command $2($4:$3,$6:$5,$8:$7):dbl
+address rmath_$2
+comment "$1";
+')
+define(`FUNCTION4',`command $2($4:$3,$6:$5,$8:$7,$10:$9):dbl
+address rmath_$2
+comment "$1";
+')
+define(`FUNCTION5',`command $2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11):dbl
+address rmath_$2
+comment "$1";
+')
+define(`FUNCTION6',`command $2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):dbl
+address rmath_$2
+comment "$1";
+')
+
+
+divert(`1')
+
+FUNCTION2(R_pow function,R_pow,dbl,x,dbl,y)
+FUNCTION2(R_pow_di function,R_pow_di,dbl,x,int,y)
+FUNCTION0(Normal random numbers,norm_rand)
+FUNCTION0(Uniform random numbers,unif_rand)
+FUNCTION0(Exponential random numbers,exp_rand)
+command set_seed(a:int,b:int):dbl
+address rmath_set_seed
+comment "R set seed";
+
+# void	get_seed(unsigned int *, unsigned int *);
+
+DIST2FUNCTION(Normal,norm,mean,sd)
+DIST2FUNCTION(Uniform,unif,min,max)
+DIST2FUNCTION(Gamma,gamma,shape,scale)
+FUNCTION1(log1pmx,log1pmx,dbl,x)
+FUNCTION1(log1pexp,log1pexp,dbl,x)
+FUNCTION1(lgamma1p,lgamma1p,dbl,x)
+FUNCTION2(logspace_add,logspace_add,dbl,logx,dbl,logy)
+FUNCTION2(logspace_sub,logspace_sub,dbl,logx,dbl,logy)
+
+# double  logspace_sum(const double *, int);
+
+DIST2FUNCTION(Beta,beta,shape1,shape2)
+DIST2FUNCTION(Log-normal,lnorm,meanlog,sdlog)
+DIST1FUNCTION(Chi-squared,chisq,df)
+DIST2FUNCTION(Non-central chi-squared,nchisq,df,ncp)
+DIST2FUNCTION(F,f,df1,df2)
+DIST1FUNCTION(T,t,df)
+DIST2FUNCTION(Binomial,binom,size,prob)
+
+# void	rmultinom(int, double*, int, int*);
+
+DIST2FUNCTION(Cauchy,cauchy,location,scale)
+DIST1FUNCTION(Exponential,exp,rate)
+DIST1FUNCTION(Geometric,geom,prob)
+DIST3FUNCTION(Hypergeometric,hyper,m,n,k)
+DIST2FUNCTION(Negative Binomial,nbinom,size,prob)
+DIST1FUNCTION(Poisson,pois,lambda)
+DIST2FUNCTION(Weibull,weibull,shape,scale)
+DIST2FUNCTION(Logistic,logis,location,scale)
+
+# DIST3FUNCTION(nbeta,shape1,shape2,ncp)
+
+FUNCTION6(Non-central beta cumulative distribution function,pnbeta,dbl,q,dbl,shape1,dbl,shape2,dbl,ncp,int,lower,int,log)
+FUNCTION6(Non-central beta quantile function,qnbeta,dbl,p,dbl,shape1,dbl,shape2,dbl,ncp,int,lower,int,log)
+FUNCTION5(Non-central beta probability density function,dnbeta,dbl,x,dbl,shape1,dbl,shape2,dbl,ncp,int,log)
+
+# FUNCTION3(rnbeta,dbl,shape1,dbl,shape2,dbl,ncp)
+# DIST3FUNCTION(nf,df1,df2,ncp)
+
+FUNCTION6(Non-central F cumulative distribution function,pnf,dbl,q,dbl,df1,dbl,df2,dbl,ncp,int,lower,int,log)
+FUNCTION6(Non-central F quantile function,qnf,dbl,p,dbl,df1,dbl,df2,dbl,ncp,int,lower,int,log)
+FUNCTION5(Non-central F probability density function,dnf,dbl,x,dbl,df1,dbl,df2,dbl,ncp,int,log)
+
+# DIST2FUNCTION(nt,df,ncp)
+
+FUNCTION5(Non-central Student t cumulative distribution function,pnt,dbl,q,dbl,df,dbl,ncp,int,lower,int,log)
+FUNCTION5(Non-central Student t quantile function,qnt,dbl,p,dbl,df,dbl,ncp,int,lower,int,log)
+FUNCTION4(Non-central Student t probability density function,dnt,dbl,x,dbl,df,dbl,ncp,int,log)
+FUNCTION6(Studentised rangecumulative distribution function,ptukey,dbl,q,dbl,nmeans,dbl,df,dbl,nranges,int,lower,int,log)
+FUNCTION6(Studentised range quantile function,qtukey,dbl,p,dbl,nmeans,dbl,df,dbl,nranges,int,lower,int,log)
+DIST2FUNCTION(Wilcoxon rank sum,wilcox, m, n)
+DIST1FUNCTION(Wilcoxon signed rank,signrank,n)
+FUNCTION1(gammafn,gammafn,dbl,x)
+FUNCTION1(lgammafn,lgammafn,dbl,x)
+
+# double  lgammafn_sign(double, int*);
+# void    dpsifn(double, int, int, int, double*, int*, int*);
+
+FUNCTION2(psigamma,psigamma,dbl,x,dbl,y)
+FUNCTION1(digamma,digamma,dbl,x)
+FUNCTION1(trigamma,trigamma,dbl,x)
+FUNCTION1(tetragamma,tetragamma,dbl,x)
+FUNCTION1(pentagamma,pentagamma,dbl,x)
+FUNCTION2(beta,beta,dbl,x,dbl,y)
+FUNCTION2(lbeta,lbeta,dbl,x,dbl,y)
+FUNCTION2(choose,choose,dbl,n,dbl,k)
+FUNCTION2(lchoose,lchoose,dbl,n,dbl,k)
+FUNCTION3(bessel_i,bessel_i,dbl,x,dbl,nu,dbl,scaled)
+FUNCTION2(bessel_j,bessel_j,dbl,x,dbl,nu)
+FUNCTION3(bessel_k,bessel_k,dbl,x,dbl,nu,dbl,scaled)
+FUNCTION2(bessel_y,bessel_y,dbl,x,dbl,nu)
+
+# double	bessel_i_ex(double, double, double, double *);
+# double	bessel_j_ex(double, double, double *);
+# double	bessel_k_ex(double, double, double, double *);
+# double	bessel_y_ex(double, double, double *);
+# FUNCTION2(pythag,dbl,x,dbl,y)
+# int	imax2(int, int);
+# int	imin2(int, int);
+
+FUNCTION2(fmax2,fmax2,dbl,x,dbl,y)
+FUNCTION2(fmin2,fmin2,dbl,x,dbl,y)
+# FUNCTION1(sign,sign,dbl,x)
+FUNCTION2(fprec,fprec,dbl,x,dbl,y)
+FUNCTION2(fround,fround,dbl,x,dbl,y)
+FUNCTION2(fsign,fsign,dbl,x,dbl,y)
+FUNCTION1(ftrunc,ftrunc,dbl,x)
+
+# FUNCTION1(log1pmx,dbl,x) # repeated
+# FUNCTION1(lgamma1p,dbl,x) # repeated
+# double cospi(double);
+# double sinpi(double);
+# double tanpi(double);
+# rmath_export dbl NA_REAL;
+# rmath_export dbl R_PosInf;
+# rmath_export dbl R_NegInf;
+# rmath_export int N01_kind;
+
+
+# function poissonci(x:int, idx:int, conflevel:dbl):dbl
+# alpha:dbl := (1:dbl - conflevel);
+# alpha := alpha / 2:dbl;
+# out:dbl := 0:dbl;
+# barrier zeroleft := (x==0)*(idx==1);
+# return out;
+# exit zeroleft;
+# barrier nonzeroleft := (x>0)*(idx==1);
+# return rmath.qgamma(alpha, x, 1:dbl);
+# exit nonzeroleft;
+# barrier right := (idx==2);
+# return rmath.gamma(1:dbl - alpha, x+1, 1:dbl);
+# exit right;
+# end poissonci;
+
+
+# module batrmath;
+
+# command pchisq(d:bat[:dbl],i:bat[:dbl]):bat[:dbl]
+# address rmathbat_pchisq_bat
+# comment "Chi Squared probability";
