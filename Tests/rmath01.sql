@@ -1,3 +1,6 @@
+-- (async-shell-command "monetdbd start ~/work/mydbfarm")
+-- (sql-monetdb)
+
 SELECT sys.pchisq(20.0, 5.0);
 
 SELECT sys.pchisq(20.0, NULL);
@@ -62,3 +65,16 @@ select count(*) from (select pchisq(value,2) from chi2) as t;
 select count(*) from (select pnorm(value,0,1) from chi2) as t;
 drop table chi2;
 
+select set_seed(1,2);
+select runif(0.0,1.0);
+select runif(0.0,1.0);
+select set_seed(1,2);
+select runif(0.0,1.0);
+select runif(0.0,1.0);
+
+select rpois(value*0+100) from sys.generate_series(1,10); -- ok
+select rpois(100) from sys.generate_series(1,10); -- NOT repeated
+
+select 10 as n, poissonci(10,1) as lower, poissonci(10,2) as upper
+union all
+select 0, poissonci(0,1), poissonci(0,2);
