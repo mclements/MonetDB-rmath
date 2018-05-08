@@ -71,6 +71,13 @@ included poissonci(y,boundary) for an exact Poisson confidence interval for coun
 
 ``` SQL
   select poissonci(10,1) as lci, poissonci(10,2) as lci;
+  
++--------------------------+--------------------------+
+| lci                      | lci                      |
++==========================+==========================+
+|       4.7953886961324335 |       18.390356042017775 |
++--------------------------+--------------------------+
+
 ```
 
 The equivalent R would be
