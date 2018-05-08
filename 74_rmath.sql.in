@@ -230,3 +230,6 @@ create function sys.poissonci(x integer, idx integer, conflevel double)
 end;
 create function sys.poissonci(x integer, idx integer)
 returns double begin return poissonci(x,idx,0.95); end;
+
+-- create function sys.rnorm(n integer, mean double, sd double)
+-- returns double external name batrmath."rnorm";

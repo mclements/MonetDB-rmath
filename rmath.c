@@ -278,6 +278,40 @@ FUNCTION1(ftrunc,dbl,x)
 // rmath_export dbl R_NegInf;
 // rmath_export int N01_kind;
 
+/* static str */
+/* batrmathrnorm(bat *retval, int n, dbl mean, dbl sd) */
+/* { */
+/* 	BAT *bn; */
+/* 	dbl r; */
+/* 	bat i; */
+/* 	if (n == int_nil) */
+/* 		throw(MAL, "batrmathrnorm", "Parameter n should not be nil"); */
+/* 	if (mean == dbl_nil) */
+/* 		throw(MAL, "batrmathrnorm", "Parameter mean should not be nil"); */
+/* 	if (sd == dbl_nil) */
+/* 		throw(MAL, "batrmathrnorm", "Parameter sd should not be nil"); */
+/* 	bn = COLnew(0, TYPE_dbl, n, TRANSIENT); */
+/* 	if (bn == NULL) { */
+/* 		throw(MAL, "batrmathrnorm", MAL_MALLOC_FAIL); */
+/* 	} */
+/* 	for(i=1; i< n; i++) { */
+/* 		r = rnorm(mean,sd); */
+/* 		if (BUNappend(bn, &r, FALSE) != GDK_SUCCEED) { */
+/* 			BBPreclaim(bn); */
+/* 			throw(MAL, "batrmathrnorm", GDK_EXCEPTION); */
+/* 		} */
+/* 	} */
+/* 	*retval = bn->batCacheid; */
+/* 	BBPkeepref(bn->batCacheid); */
+/* 	return MAL_SUCCEED; */
+/* } */
+/* str */
+/* batrmath_rnorm(bat *retval, int *n, dbl *mean, dbl *sd) */
+/* { */
+/*   return batrmathrnorm(retval, *n, *mean, *sd); */
+/* } */
+
+
 // clean up macros
 #undef FUNCTION0
 #undef FUNCTION1
