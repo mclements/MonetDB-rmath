@@ -5,3 +5,4 @@ rmath.o
 .monetdb
 rmath.mal
 74_rmath.sql
+README.html
