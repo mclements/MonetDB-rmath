@@ -218,18 +218,36 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- rmath_export double R_NegInf;
 -- rmath_export int N01_kind;
 
-create function sys.poissonci(x integer, idx integer, conflevel double)
-       returns double
-       begin
-       declare alpha double;
-       set alpha = (1.0-conflevel)/2.0;
-       if (x=0 and idx=1) then return 0.0;
-       elseif (idx=1) then return qgamma(alpha, cast(x as double), 1.0);
-       else return qgamma(1.0-alpha,cast(1+x as double),1.0);
-       end if;
-end;
-create function sys.poissonci(x integer, idx integer)
-returns double begin return poissonci(x,idx,0.95); end;
+-- create function sys.poissonci(x integer, idx integer, conflevel double)
+--        returns double
+--        begin
+--        declare alpha double;
+--        set alpha = (1.0-conflevel)/2.0;
+--        if (x=0 and idx=1) then return 0.0;
+--        elseif (idx=1) then return qgamma(alpha, cast(x as double), 1.0);
+--        else return qgamma(1.0-alpha,cast(1+x as double),1.0);
+--        end if;
+-- end;
+
+FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
+create function sys.poisson_ci(x double, boundary integer)
+returns double begin return poisson_ci(x,boundary,0.95); end;
+
+-- deprecated call
+create function sys.poissonci(x double, boundary integer, conflevel double)
+returns double begin return poisson_ci(x,boundary,conflevel); end;
+
+-- deprecated call
+create function sys.poissonci(x double, boundary integer)
+returns double begin return poisson_ci(x,boundary,0.95); end;
+
+FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
+
+create function sys.poisson_test(x double, t double, r double)
+returns double begin return poisson_test(x,t,r,2); end;
+
+create function sys.poisson_test(x double, t double)
+returns double begin return poisson_test(x,t,1.0,2); end;
 
 -- create function sys.rnorm(n integer, mean double, sd double)
 -- returns double external name batrmath."rnorm";

@@ -203,25 +203,12 @@ FUNCTION1(ftrunc,ftrunc,dbl,x)
 # rmath_export dbl R_NegInf;
 # rmath_export int N01_kind;
 
-
-# function poissonci(x:int, idx:int, conflevel:dbl):dbl
-# alpha:dbl := (1:dbl - conflevel);
-# alpha := alpha / 2:dbl;
-# out:dbl := 0:dbl;
-# barrier zeroleft := (x==0)*(idx==1);
-# return out;
-# exit zeroleft;
-# barrier nonzeroleft := (x>0)*(idx==1);
-# return rmath.qgamma(alpha, x, 1:dbl);
-# exit nonzeroleft;
-# barrier right := (idx==2);
-# return rmath.gamma(1:dbl - alpha, x+1, 1:dbl);
-# exit right;
-# end poissonci;
-
+FUNCTION3(Exact Poisson confidence interval,poisson_ci,dbl,x,int,boundary,dbl,conflevel)
+FUNCTION4(Poisson test,poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
 
 # module batrmath;
 
-# command pchisq(d:bat[:dbl],i:bat[:dbl]):bat[:dbl]
-# address rmathbat_pchisq_bat
-# comment "Chi Squared probability";
+# command rnorm(n:int,mean:dbl,sd:dbl):bat[:dbl]
+# address batrmath_rnorm
+# comment "Normal random numbers";
+

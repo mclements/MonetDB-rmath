@@ -73,7 +73,8 @@ select runif(0.0,1.0);
 select runif(0.0,1.0);
 
 select rpois(value*0+100) from sys.generate_series(1,10); -- ok
-select rpois(100) from sys.generate_series(1,10); -- NOT repeated
+select value, rpois(100) from sys.generate_series(1,10);  -- repeated
+select rpois(100) from sys.generate_series(1,10);         -- repeated
 
 select 10 as n, poissonci(10,1) as lower, poissonci(10,2) as upper
 union all
