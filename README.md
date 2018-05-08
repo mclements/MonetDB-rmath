@@ -70,7 +70,7 @@ All of the functions are currently scalars. Next steps include adding BAT functi
 included poissonci(y,boundary) for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%:
 
 ``` SQL
-  select poissonci(10,1) as lci, poissonci(10,2) as lci;
+  select poissonci(10,1) as lci, poissonci(10,2) as uci;
   
 +--------------------------+--------------------------+
 | lci                      | lci                      |
