@@ -6,88 +6,92 @@
 # Copyright 2018 Mark Clements
 
 module rmath;
+module batrmath;
 divert(`-1')
 
 define(`DIST1FUNCTION',`# $1 distribution
-command p$2(q:dbl,$3:dbl,lower:int,log:int):dbl
-address rmath_p$2
-comment "$1 cumulative density function";
-
-command q$2(p:dbl,$3:dbl,lower:int,log:int):dbl
-address rmath_q$2
-comment "$1 quantile function";
-
-command d$2(x:dbl,$3:dbl,log:int):dbl
-address rmath_d$2
-comment "$1 probability density function";
-
-command r$2($3:dbl):dbl
-address rmath_r$2
-comment "$1 random numbers";
+FUNCTION4($1 cumulative density function,p$2,dbl,q,dbl,$3,int,lower,int,log)
+FUNCTION4($1 quantile function,q$2,dbl,p,dbl,$3,int,lower,int,log)
+FUNCTION3($1 probability density function,d$2,dbl,p,dbl,$3,int,log)
+FUNCTION1($1 random numbers,r$2,dbl,$3)
+BATFUNCTION4($1 cumulative density function,p$2,bat[:dbl],q,dbl,$3,int,lower,int,log)
+BATFUNCTION4($1 quantile function,q$2,dbl,p,bat[:dbl],$3,int,lower,int,log)
+BATFUNCTION3($1 probability density function,d$2,bat[:dbl],p,dbl,$3,int,log)
+BATFUNCTION1($1 random numbers,r$2,bat[:dbl],$3)
 ')
 
 define(`DIST2FUNCTION',`# $1 distribution
-command p$2(q:dbl,$3:dbl,$4:dbl,lower:int,log:int):dbl
-address rmath_p$2
-comment "$1 cumulative distribution function";
-
-command q$2(p:dbl,$3:dbl,$4:dbl,lower:int,log:int):dbl
-address rmath_q$2
-comment "$1 quantile function";
-
-command d$2(x:dbl,$3:dbl,$4:dbl,log:int):dbl
-address rmath_d$2
-comment "$1 probability density function";
-
-command r$2($3:dbl,$4:dbl):dbl
-address rmath_r$2
-comment "$1 random numbers";
+FUNCTION5($1 cumulative density function,p$2,dbl,q,dbl,$3,dbl,$4,int,lower,int,log)
+FUNCTION5($1 quantile function,q$2,dbl,p,dbl,$3,dbl,$4,int,lower,int,log)
+FUNCTION4($1 probability density function,d$2,dbl,p,dbl,$3,dbl,$4,int,log)
+FUNCTION2($1 random numbers,r$2,dbl,$3,dbl,$4)
+BATFUNCTION5($1 cumulative density function,p$2,bat[:dbl],q,dbl,$3,dbl,$4,int,lower,int,log)
+BATFUNCTION5($1 quantile function,q$2,dbl,p,bat[:dbl],$3,dbl,$4,int,lower,int,log)
+BATFUNCTION4($1 probability density function,d$2,bat[:dbl],p,dbl,$3,dbl,$4,int,log)
+BATFUNCTION2($1 random numbers,r$2,bat[:dbl],$3,dbl,$4)
 ')
 
 define(`DIST3FUNCTION',`# $1 distribution
-command p$2(q:dbl,$3:dbl,$4:dbl,$5:dbl,lower:int,log:int):dbl
-address rmath_p$2
-comment "$1 cumulative distribution function";
-
-command q$2(p:dbl,$3:dbl,$4:dbl,$5:dbl,lower:int,log:int):dbl
-address rmath_q$2
-comment "$1 quantile function";
-
-command d$2(x:dbl,$3:dbl,$4:dbl,$5:dbl,log:int):dbl
-address rmath_d$2
-comment "$1 probability density function";
-
-command r$2($3:dbl,$4:dbl,$5:dbl):dbl
-address rmath_r$2
-comment "$1 random numbers";
+FUNCTION6($1 cumulative density function,p$2,dbl,q,dbl,$3,dbl,$4,dbl,$5,int,lower,int,log)
+FUNCTION6($1 quantile function,q$2,dbl,p,dbl,$3,dbl,$4,dbl,$5,int,lower,int,log)
+FUNCTION5($1 probability density function,d$2,dbl,p,dbl,$3,dbl,$4,dbl,$5,int,log)
+FUNCTION3($1 random numbers,r$2,dbl,$3,dbl,$4,dbl,$5)
+BATFUNCTION6($1 cumulative density function,p$2,bat[:dbl],q,dbl,$3,dbl,$4,dbl,$5,int,lower,int,log)
+BATFUNCTION6($1 quantile function,q$2,dbl,p,bat[:dbl],$3,dbl,$4,dbl,$5,int,lower,int,log)
+BATFUNCTION5($1 probability density function,d$2,bat[:dbl],p,dbl,$3,dbl,$4,dbl,$5,int,log)
+BATFUNCTION3($1 random numbers,r$2,bat[:dbl],$3,dbl,$4,dbl,$5)
 ')
 
-define(`FUNCTION0',`command $2():dbl
+define(`FUNCTION0',`command rmath.$2():dbl
 address rmath_$2
 comment "$1";
 ')
-define(`FUNCTION1',`command $2($4:$3):dbl
+define(`FUNCTION1',`command rmath.$2($4:$3):dbl
 address rmath_$2
 comment "$1";
 ')
-define(`FUNCTION2',`command $2($4:$3,$6:$5):dbl
+define(`FUNCTION2',`command rmath.$2($4:$3,$6:$5):dbl
 address rmath_$2
 comment "$1";
 ')
-define(`FUNCTION3',`command $2($4:$3,$6:$5,$8:$7):dbl
+define(`FUNCTION3',`command rmath.$2($4:$3,$6:$5,$8:$7):dbl
 address rmath_$2
 comment "$1";
 ')
-define(`FUNCTION4',`command $2($4:$3,$6:$5,$8:$7,$10:$9):dbl
+define(`FUNCTION4',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9):dbl
 address rmath_$2
 comment "$1";
 ')
-define(`FUNCTION5',`command $2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11):dbl
+define(`FUNCTION5',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11):dbl
 address rmath_$2
 comment "$1";
 ')
-define(`FUNCTION6',`command $2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):dbl
+define(`FUNCTION6',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):dbl
 address rmath_$2
+comment "$1";
+')
+define(`BATFUNCTION1',`command batrmath.$2($4:$3):bat[:dbl]
+address bat_rmath_$2
+comment "$1";
+')
+define(`BATFUNCTION2',`command batrmath.$2($4:$3,$6:$5):bat[:dbl]
+address bat_rmath_$2
+comment "$1";
+')
+define(`BATFUNCTION3',`command batrmath.$2($4:$3,$6:$5,$8:$7):bat[:dbl]
+address bat_rmath_$2
+comment "$1";
+')
+define(`BATFUNCTION4',`command batrmath.$2($4:$3,$6:$5,$8:$7,$10:$9):bat[:dbl]
+address bat_rmath_$2
+comment "$1";
+')
+define(`BATFUNCTION5',`command batrmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11):bat[:dbl]
+address bat_rmath_$2
+comment "$1";
+')
+define(`BATFUNCTION6',`command batrmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):bat[:dbl]
+address bat_rmath_$2
 comment "$1";
 ')
 
@@ -205,10 +209,7 @@ FUNCTION1(ftrunc,ftrunc,dbl,x)
 
 FUNCTION3(Exact Poisson confidence interval,poisson_ci,dbl,x,int,boundary,dbl,conflevel)
 FUNCTION4(Poisson test,poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
+BATFUNCTION3(Exact Poisson confidence interval,poisson_ci,bat[:dbl],x,int,boundary,dbl,conflevel)
+BATFUNCTION4(Poisson test,poisson_test,bat[:dbl],x,dbl,t,dbl,r,int,alternative)
 
-# module batrmath;
-
-# command rnorm(n:int,mean:dbl,sd:dbl):bat[:dbl]
-# address batrmath_rnorm
-# comment "Normal random numbers";
 
