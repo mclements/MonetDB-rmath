@@ -39,6 +39,7 @@
   {									\
     return rmath ## NAME(retval);					\
   }
+
 #define FUNCTION1(NAME,TYPE,ARG)					\
   static str								\
   rmath ## NAME(dbl *retval, TYPE ARG)					\
@@ -153,6 +154,55 @@
     bat_rmath_ ## NAME(bat *retval, bat *ARG1, dbl *ARG2)		\
   {									\
     return batrmath ## NAME(retval, *ARG1, *ARG2);			\
+  }									\
+  static str								\
+  batrmathbats ## NAME(bat *retval, bat ARG1, bat ARG2)			\
+  {									\
+    BAT * arg[2];							\
+    BAT *bn;								\
+    dbl r_;								\
+    dbl* valp[2];							\
+    size_t cnt = 0, i, j, kk, ncol=2;					\
+    if (((arg[j=0] = BATdescriptor(ARG1)) == NULL) ||			\
+	((arg[j=1] = BATdescriptor(ARG2)) == NULL)) {			\
+      for (kk = 0; kk < j; kk++)					\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    bn = COLnew(arg[0]->hseqbase, TYPE_dbl, cnt = BATcount(arg[0]), TRANSIENT); \
+    if (bn == NULL) {							\
+      for (kk=0; kk<ncol; kk++)						\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    for (kk=0; kk<ncol; kk++)						\
+      valp[kk] = (dbl *) Tloc(arg[kk], 0);				\
+    for (i = 0; i < cnt; i++) {						\
+      for (j = 0; i < ncol; j++) {					\
+	if (valp[j][i] == dbl_nil) {					\
+	  for (kk = 0; kk < ncol; kk++)					\
+	    BBPunfix(arg[kk]->batCacheid);				\
+	  BBPreclaim(bn);						\
+	  throw(MAL, "batrmath." # NAME, "Wrong value for argument");	\
+	}								\
+      }									\
+      r_ = NAME(valp[0][i], valp[1][i]);				\
+      if (BUNappend(bn, &r_, FALSE) != GDK_SUCCEED) {			\
+	for (kk = 0; kk < ncol; kk++)					\
+	  BBPunfix(arg[kk]->batCacheid);				\
+	BBPreclaim(bn);							\
+	throw(MAL, "batrmath." # NAME, GDK_EXCEPTION);			\
+      }									\
+    }									\
+    BBPkeepref(*retval = bn->batCacheid);				\
+    for (kk=0; kk<ncol; kk++)						\
+      BBPunfix(arg[kk]->batCacheid);					\
+    return MAL_SUCCEED;							\
+  }									\
+  rmath_export str							\
+  bat_rmath_bats_ ## NAME(bat *retval, bat *ARG1, bat *ARG2)		\
+  {									\
+    return batrmathbats ## NAME(retval, *ARG1, *ARG2);			\
   }
 
 #define FUNCTION3(NAME,TYPE1,ARG1,TYPE2,ARG2,TYPE3,ARG3)		\
@@ -217,8 +267,58 @@
   bat_rmath_ ## NAME(bat *retval, bat *ARG1, dbl *ARG2, dbl *ARG3)	\
   {									\
     return batrmath ## NAME(retval, *ARG1, *ARG2, *ARG3);		\
+  }									\
+  static str								\
+  batrmathbats ## NAME(bat *retval, bat ARG1, bat ARG2, bat ARG3) \
+  {									\
+    BAT * arg[3];							\
+    BAT *bn;								\
+    dbl r_;								\
+    dbl* valp[3];							\
+    size_t cnt = 0, i, j, kk, ncol=3;					\
+    if (((arg[j=0] = BATdescriptor(ARG1)) == NULL) ||			\
+	((arg[j=1] = BATdescriptor(ARG2)) == NULL) ||			\
+	((arg[j=2] = BATdescriptor(ARG3)) == NULL)) {			\
+      for (kk = 0; kk < j; kk++)					\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    bn = COLnew(arg[0]->hseqbase, TYPE_dbl, cnt = BATcount(arg[0]), TRANSIENT); \
+    if (bn == NULL) {							\
+      for (kk=0; kk<ncol; kk++)						\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    for (kk=0; kk<ncol; kk++)						\
+      valp[kk] = (dbl *) Tloc(arg[kk], 0);				\
+    for (i = 0; i < cnt; i++) {						\
+      for (j = 0; i < ncol; j++) {					\
+	if (valp[j][i] == dbl_nil) {					\
+	  for (kk = 0; kk < ncol; kk++)					\
+	    BBPunfix(arg[kk]->batCacheid);				\
+	  BBPreclaim(bn);						\
+	  throw(MAL, "batrmath." # NAME, "Wrong value for argument");	\
+	}								\
+      }									\
+      r_ = NAME(valp[0][i], valp[1][i], valp[2][i]);	\
+      if (BUNappend(bn, &r_, FALSE) != GDK_SUCCEED) {			\
+	for (kk = 0; kk < ncol; kk++)					\
+	  BBPunfix(arg[kk]->batCacheid);				\
+	BBPreclaim(bn);							\
+	throw(MAL, "batrmath." # NAME, GDK_EXCEPTION);			\
+      }									\
+    }									\
+    BBPkeepref(*retval = bn->batCacheid);				\
+    for (kk=0; kk<ncol; kk++)						\
+      BBPunfix(arg[kk]->batCacheid);					\
+    return MAL_SUCCEED;							\
+  }									\
+  rmath_export str							\
+  bat_rmath_bats_ ## NAME(bat *retval, bat *ARG1, bat *ARG2, bat *ARG3) \
+  {									\
+    return batrmathbats ## NAME(retval, *ARG1, *ARG2, *ARG3);		\
   }
-
+  
 #define FUNCTION4(NAME,TYPE1,ARG1,TYPE2,ARG2,TYPE3,ARG3,TYPE4,ARG4)	\
   static str								\
   rmath ## NAME(dbl *retval, TYPE1 ARG1, TYPE2 ARG2, TYPE3 ARG3, TYPE4 ARG4) \
@@ -282,11 +382,62 @@
     return MAL_SUCCEED;							\
   }									\
   rmath_export str							\
-    bat_rmath_ ## NAME(bat *retval, bat *ARG1, dbl *ARG2, dbl *ARG3, dbl *ARG4) \
+  bat_rmath_ ## NAME(bat *retval, bat *ARG1, dbl *ARG2, dbl *ARG3, dbl *ARG4) \
   {									\
-    return batrmath ## NAME(retval, *ARG1, *ARG2, *ARG3, *ARG4); \
+    return batrmath ## NAME(retval, *ARG1, *ARG2, *ARG3, *ARG4);	\
+  }									\
+  static str								\
+  batrmathbats ## NAME(bat *retval, bat ARG1, bat ARG2, bat ARG3, bat ARG4) \
+  {									\
+    BAT * arg[4];							\
+    BAT *bn;								\
+    dbl r_;								\
+    dbl* valp[4];							\
+    size_t cnt = 0, i, j, kk, ncol=4;					\
+    if (((arg[j=0] = BATdescriptor(ARG1)) == NULL) ||			\
+	((arg[j=1] = BATdescriptor(ARG2)) == NULL) ||			\
+	((arg[j=2] = BATdescriptor(ARG3)) == NULL) ||			\
+	((arg[j=3] = BATdescriptor(ARG4)) == NULL)) {			\
+      for (kk = 0; kk < j; kk++)					\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    bn = COLnew(arg[0]->hseqbase, TYPE_dbl, cnt = BATcount(arg[0]), TRANSIENT); \
+    if (bn == NULL) {							\
+      for (kk=0; kk<ncol; kk++)						\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    for (kk=0; kk<ncol; kk++)						\
+      valp[kk] = (dbl *) Tloc(arg[kk], 0);				\
+    for (i = 0; i < cnt; i++) {						\
+      for (j = 0; i < ncol; j++) {					\
+	if (valp[j][i] == dbl_nil) {					\
+	  for (kk = 0; kk < ncol; kk++)					\
+	    BBPunfix(arg[kk]->batCacheid);				\
+	  BBPreclaim(bn);						\
+	  throw(MAL, "batrmath." # NAME, "Wrong value for argument");	\
+	}								\
+      }									\
+      r_ = NAME(valp[0][i], valp[1][i], valp[2][i], valp[3][i]);	\
+      if (BUNappend(bn, &r_, FALSE) != GDK_SUCCEED) {			\
+	for (kk = 0; kk < ncol; kk++)					\
+	  BBPunfix(arg[kk]->batCacheid);				\
+	BBPreclaim(bn);							\
+	throw(MAL, "batrmath." # NAME, GDK_EXCEPTION);			\
+      }									\
+    }									\
+    BBPkeepref(*retval = bn->batCacheid);				\
+    for (kk=0; kk<ncol; kk++)						\
+      BBPunfix(arg[kk]->batCacheid);					\
+    return MAL_SUCCEED;							\
+  }									\
+  rmath_export str							\
+  bat_rmath_bats_ ## NAME(bat *retval, bat *ARG1, bat *ARG2, bat *ARG3, bat *ARG4) \
+  {									\
+    return batrmathbats ## NAME(retval, *ARG1, *ARG2, *ARG3, *ARG4); \
   }
-  
+
 #define FUNCTION5(NAME,TYPE1,ARG1,TYPE2,ARG2,TYPE3,ARG3,TYPE4,ARG4,TYPE5,ARG5) \
   static str								\
   rmath ## NAME(dbl *retval, TYPE1 ARG1, TYPE2 ARG2, TYPE3 ARG3, TYPE4 ARG4, TYPE5 ARG5) \
@@ -357,6 +508,58 @@
     bat_rmath_ ## NAME(bat *retval, bat *ARG1, dbl *ARG2, dbl *ARG3, dbl *ARG4, dbl *ARG5) \
   {									\
     return batrmath ## NAME(retval, *ARG1, *ARG2, *ARG3, *ARG4, *ARG5); \
+  }									\
+  static str								\
+  batrmathbats ## NAME(bat *retval, bat ARG1, bat ARG2, bat ARG3, bat ARG4, bat ARG5) \
+  {									\
+    BAT * arg[5];							\
+    BAT *bn;								\
+    dbl r_;								\
+    dbl* valp[5];							\
+    size_t cnt = 0, i, j, kk, ncol=5;					\
+    if (((arg[j=0] = BATdescriptor(ARG1)) == NULL) ||			\
+	((arg[j=1] = BATdescriptor(ARG2)) == NULL) ||			\
+	((arg[j=2] = BATdescriptor(ARG3)) == NULL) ||			\
+	((arg[j=3] = BATdescriptor(ARG4)) == NULL) ||			\
+	((arg[j=4] = BATdescriptor(ARG5)) == NULL)) {			\
+      for (kk = 0; kk < j; kk++)					\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    bn = COLnew(arg[0]->hseqbase, TYPE_dbl, cnt = BATcount(arg[0]), TRANSIENT); \
+    if (bn == NULL) {							\
+      for (kk=0; kk<ncol; kk++)						\
+	BBPunfix(arg[kk]->batCacheid);					\
+      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
+    }									\
+    for (kk=0; kk<ncol; kk++)						\
+      valp[kk] = (dbl *) Tloc(arg[kk], 0);				\
+    for (i = 0; i < cnt; i++) {						\
+      for (j = 0; i < ncol; j++) {					\
+	if (valp[j][i] == dbl_nil) {					\
+	  for (kk = 0; kk < ncol; kk++)					\
+	    BBPunfix(arg[kk]->batCacheid);				\
+	  BBPreclaim(bn);						\
+	  throw(MAL, "batrmath." # NAME, "Wrong value for argument");	\
+	}								\
+      }									\
+      r_ = NAME(valp[0][i], valp[1][i], valp[2][i], valp[3][i], valp[4][i]); \
+      if (BUNappend(bn, &r_, FALSE) != GDK_SUCCEED) {			\
+	for (kk = 0; kk < ncol; kk++)					\
+	  BBPunfix(arg[kk]->batCacheid);				\
+	BBPreclaim(bn);							\
+	throw(MAL, "batrmath." # NAME, GDK_EXCEPTION);			\
+      }									\
+    }									\
+    BBPkeepref(*retval = bn->batCacheid);				\
+    for (kk=0; kk<ncol; kk++)						\
+      BBPunfix(arg[kk]->batCacheid);					\
+    return MAL_SUCCEED;							\
+  }									\
+  rmath_export str							\
+  bat_rmath_bats_ ## NAME(bat *retval, bat *ARG1, bat *ARG2, bat *ARG3, bat *ARG4, bat *ARG5) \
+  {									\
+    return batrmathbats ## NAME(retval, *ARG1, *ARG2, *ARG3, *ARG4, *ARG5); \
   }
 
 #define FUNCTION6(NAME,TYPE1,ARG1,TYPE2,ARG2,TYPE3,ARG3,TYPE4,ARG4,TYPE5,ARG5,TYPE6,ARG6) \
@@ -437,138 +640,49 @@
   static str								\
   batrmathbats ## NAME(bat *retval, bat ARG1, bat ARG2, bat ARG3, bat ARG4, bat ARG5, bat ARG6) \
   {									\
-    BAT *arg1, *arg2, *arg3, *arg4, *arg5, *arg6, *bn;			\
-    dbl r_, *arg1p, *arg2p, *arg3p, *arg4p, *arg5p, *arg6p;		\
-    size_t cnt = 0, i;							\
-    if ((arg1 = BATdescriptor(ARG1)) == NULL) {				\
+    BAT * arg[6];							\
+    BAT *bn;								\
+    dbl r_;								\
+    dbl* valp[6];							\
+    size_t cnt = 0, i, j, kk, ncol=6;					\
+    if (((arg[j=0] = BATdescriptor(ARG1)) == NULL) ||			\
+	((arg[j=1] = BATdescriptor(ARG2)) == NULL) ||			\
+	((arg[j=2] = BATdescriptor(ARG3)) == NULL) ||			\
+	((arg[j=3] = BATdescriptor(ARG4)) == NULL) ||			\
+	((arg[j=4] = BATdescriptor(ARG5)) == NULL) ||			\
+	((arg[j=5] = BATdescriptor(ARG6)) == NULL)) {			\
+      for (kk = 0; kk < j; kk++)					\
+	BBPunfix(arg[kk]->batCacheid);					\
       throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
     }									\
-    if ((arg2 = BATdescriptor(ARG2)) == NULL) {				\
-      BBPunfix(arg1->batCacheid);					\
-      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
-    }									\
-    if ((arg3 = BATdescriptor(ARG3)) == NULL) {				\
-      BBPunfix(arg1->batCacheid);					\
-      BBPunfix(arg2->batCacheid);					\
-      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
-    }									\
-    if ((arg4 = BATdescriptor(ARG4)) == NULL) {				\
-      BBPunfix(arg1->batCacheid);					\
-      BBPunfix(arg2->batCacheid);					\
-      BBPunfix(arg3->batCacheid);					\
-      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
-    }									\
-    if ((arg5 = BATdescriptor(ARG5)) == NULL) {				\
-      BBPunfix(arg1->batCacheid);					\
-      BBPunfix(arg2->batCacheid);					\
-      BBPunfix(arg3->batCacheid);					\
-      BBPunfix(arg4->batCacheid);					\
-      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
-    }									\
-    if ((arg6 = BATdescriptor(ARG6)) == NULL) {				\
-      BBPunfix(arg1->batCacheid);					\
-      BBPunfix(arg2->batCacheid);					\
-      BBPunfix(arg3->batCacheid);					\
-      BBPunfix(arg4->batCacheid);					\
-      BBPunfix(arg5->batCacheid);					\
-      throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
-    }									\
-    bn = COLnew(arg1->hseqbase, TYPE_dbl, cnt = BATcount(arg1), TRANSIENT); \
+    bn = COLnew(arg[0]->hseqbase, TYPE_dbl, cnt = BATcount(arg[0]), TRANSIENT); \
     if (bn == NULL) {							\
-      BBPunfix(arg1->batCacheid);					\
-      BBPunfix(arg2->batCacheid);					\
-      BBPunfix(arg3->batCacheid);					\
-      BBPunfix(arg4->batCacheid);					\
-      BBPunfix(arg5->batCacheid);					\
-      BBPunfix(arg6->batCacheid);					\
+      for (kk=0; kk<ncol; kk++)						\
+	BBPunfix(arg[kk]->batCacheid);					\
       throw(MAL, "batrmath." # NAME, RUNTIME_OBJECT_MISSING);		\
     }									\
-    arg1p = (dbl *) Tloc(arg1, 0);					\
-    arg2p = (dbl *) Tloc(arg2, 0);					\
-    arg3p = (dbl *) Tloc(arg3, 0);					\
-    arg4p = (dbl *) Tloc(arg4, 0);					\
-    arg5p = (dbl *) Tloc(arg5, 0);					\
-    arg6p = (dbl *) Tloc(arg6, 0);					\
+    for (kk=0; kk<ncol; kk++)						\
+      valp[kk] = (dbl *) Tloc(arg[kk], 0);				\
     for (i = 0; i < cnt; i++) {						\
-      if (arg1p[i] == dbl_nil) {					\
-	BBPunfix(arg1->batCacheid);					\
-	BBPunfix(arg2->batCacheid);					\
-	BBPunfix(arg3->batCacheid);					\
-	BBPunfix(arg4->batCacheid);					\
-	BBPunfix(arg5->batCacheid);					\
-	BBPunfix(arg6->batCacheid);					\
-	BBPreclaim(bn);							\
-	throw(MAL, "batrmath." # NAME, "Wrong value for " # ARG1);	\
+      for (j = 0; i < ncol; j++) {					\
+	if (valp[j][i] == dbl_nil) {					\
+	  for (kk = 0; kk < ncol; kk++)					\
+	    BBPunfix(arg[kk]->batCacheid);				\
+	  BBPreclaim(bn);						\
+	  throw(MAL, "batrmath." # NAME, "Wrong value for argument");	\
+	}								\
       }									\
-      if (arg2p[i] == dbl_nil) {					\
-	BBPunfix(arg1->batCacheid);					\
-	BBPunfix(arg2->batCacheid);					\
-	BBPunfix(arg3->batCacheid);					\
-	BBPunfix(arg4->batCacheid);					\
-	BBPunfix(arg5->batCacheid);					\
-	BBPunfix(arg6->batCacheid);					\
-	BBPreclaim(bn);							\
-	throw(MAL, "batrmath." # NAME, "Wrong value for " # ARG2);	\
-      }									\
-      if (arg3p[i] == dbl_nil) {					\
-	BBPunfix(arg1->batCacheid);					\
-	BBPunfix(arg2->batCacheid);					\
-	BBPunfix(arg3->batCacheid);					\
-	BBPunfix(arg4->batCacheid);					\
-	BBPunfix(arg5->batCacheid);					\
-	BBPunfix(arg6->batCacheid);					\
-	BBPreclaim(bn);							\
-	throw(MAL, "batrmath." # NAME, "Wrong value for " # ARG3);	\
-      }									\
-      if (arg4p[i] == dbl_nil) {					\
-	BBPunfix(arg1->batCacheid);					\
-	BBPunfix(arg2->batCacheid);					\
-	BBPunfix(arg3->batCacheid);					\
-	BBPunfix(arg4->batCacheid);					\
-	BBPunfix(arg5->batCacheid);					\
-	BBPunfix(arg6->batCacheid);					\
-	BBPreclaim(bn);							\
-	throw(MAL, "batrmath." # NAME, "Wrong value for " # ARG4);	\
-      }									\
-      if (arg5p[i] == dbl_nil) {					\
-	BBPunfix(arg1->batCacheid);					\
-	BBPunfix(arg2->batCacheid);					\
-	BBPunfix(arg3->batCacheid);					\
-	BBPunfix(arg4->batCacheid);					\
-	BBPunfix(arg5->batCacheid);					\
-	BBPunfix(arg6->batCacheid);					\
-	BBPreclaim(bn);							\
-	throw(MAL, "batrmath." # NAME, "Wrong value for " # ARG5);	\
-      }									\
-      if (arg6p[i] == dbl_nil) {					\
-	BBPunfix(arg1->batCacheid);					\
-	BBPunfix(arg2->batCacheid);					\
-	BBPunfix(arg3->batCacheid);					\
-	BBPunfix(arg4->batCacheid);					\
-	BBPunfix(arg5->batCacheid);					\
-	BBPunfix(arg6->batCacheid);					\
-	BBPreclaim(bn);							\
-	throw(MAL, "batrmath." # NAME, "Wrong value for " # ARG6);	\
-      }									\
-      r_ = NAME(arg1p[i], arg2p[i], arg3p[i], arg4p[i], arg5p[i], arg6p[i]); \
+      r_ = NAME(valp[0][i], valp[1][i], valp[2][i], valp[3][i], valp[4][i], valp[5][i]); \
       if (BUNappend(bn, &r_, FALSE) != GDK_SUCCEED) {			\
-	BBPunfix(arg1->batCacheid);					\
-	BBPunfix(arg2->batCacheid);					\
-	BBPunfix(arg3->batCacheid);					\
-	BBPunfix(arg4->batCacheid);					\
-	BBPunfix(arg5->batCacheid);					\
-	BBPunfix(arg6->batCacheid);					\
+	for (kk = 0; kk < ncol; kk++)					\
+	  BBPunfix(arg[kk]->batCacheid);				\
 	BBPreclaim(bn);							\
 	throw(MAL, "batrmath." # NAME, GDK_EXCEPTION);			\
       }									\
     }									\
     BBPkeepref(*retval = bn->batCacheid);				\
-    BBPunfix(arg1->batCacheid);						\
-    BBPunfix(arg2->batCacheid);						\
-    BBPunfix(arg3->batCacheid);						\
-    BBPunfix(arg4->batCacheid);						\
-    BBPunfix(arg5->batCacheid);						\
-    BBPunfix(arg6->batCacheid);						\
+    for (kk=0; kk<ncol; kk++)						\
+      BBPunfix(arg[kk]->batCacheid);					\
     return MAL_SUCCEED;							\
   }									\
   rmath_export str							\
