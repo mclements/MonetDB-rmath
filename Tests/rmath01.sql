@@ -89,11 +89,18 @@ create function poisson_ci3(y double) returns table (lci double, uci double) lan
 -- table returning function using C code
 drop function poisson_ci4(double);
 create function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select poisson_ci(y,1) as lci, poisson_ci(y,2) as uci); end;
+-- vectorised R code
+drop function poisson_ci5(double);
+create function poisson_ci5(y double) returns table (lci double, uci double) language r {alpha=0.025; data.frame(lci=ifelse(y==0,0,qgamma(alpha,y)), uci=qgamma(1-alpha,y+1))};
 
-select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_series(1.0,10000.0,1.0)) as t; -- 32ms
-select sum(lci), sum(uci) from (select poisson_ci2(value,1) as lci, poisson_ci2(value,2) as uci from generate_series(1.0,10000.0,1.0)) as t; -- 1.6s
-select sum(lci), sum(uci) from poisson_ci3((select value from generate_series(1.0,10000.0,1.0))); -- 790ms
-select sum(lci), sum(uci) from poisson_ci4((select value from generate_series(1.0,10000.0,1.0))); -- 1.1s?? SLOW
+drop table vals;
+create table vals as select cast(value as double) as value from generate_series(1.0,10000.0,1.0);
+select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from vals) as t; -- 32ms FASTEST (slightly faster than vectorised R)
+select sum(lci), sum(uci) from (select poisson_ci2(value,1) as lci, poisson_ci2(value,2) as uci from vals) as t; -- 1.6s
+select sum(lci), sum(uci) from poisson_ci3((select value from vals)); -- 790ms
+select sum(lci), sum(uci) from poisson_ci4((select value from vals)); -- 1.1s?? SLOW
+select sum(lci), sum(uci) from poisson_ci5((select value from vals)); -- 40ms FAST
+select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2; -- 1.3s SLOW (lateral)
 
 drop table test;
 create table test as select * from poisson_ci4((select value from generate_series(1.0,10000.0,1.0))); -- 1.2s
@@ -110,6 +117,15 @@ select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value 
 explain select poisson_ci(value,1,0.95) as lci, poisson_ci(value,2,0.95) as uci from generate_series(10.0,11.0,1.0);
 explain select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_series(10.0,11.0,1.0);
 explain select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value union select 11 as value) as x;
+explain select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2;
+
+
+drop table test;
+create table test as select 1 as boundary, value as y, 0.95 as conflevel from generate_series(0.0,10.0,1.0);
+explain select poisson_ci(y,boundary,conflevel) from test;
+select poisson_ci(y,boundary,conflevel) from test;
+select poisson_ci(y,1) from test;
+
 
 select * from poisson_ci3(10); 
 select * from poisson_ci4(10); 
