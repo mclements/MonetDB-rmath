@@ -79,3 +79,46 @@ select rpois(100) from sys.generate_series(1,10);         -- repeated
 select 10 as n, poissonci(10,1) as lower, poissonci(10,2) as upper
 union all
 select 0, poissonci(0,1), poissonci(0,2);
+
+-- scalar function using R
+drop function poisson_ci2(double,integer);
+create function poisson_ci2(y double,boundary integer) returns double language r {sapply(y,function(yi) poisson.test(yi)$conf.int[boundary])};
+-- table returning function using R
+drop function poisson_ci3(double);
+create function poisson_ci3(y double) returns table (lci double, uci double) language r {val = t(sapply(y,function(yi) {poisson.test(yi)$conf.int})); data.frame(lci=val[,1],uci=val[,2])};
+-- table returning function using C code
+drop function poisson_ci4(double);
+create function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select poisson_ci(y,1) as lci, poisson_ci(y,2) as uci); end;
+
+select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_series(1.0,10000.0,1.0)) as t; -- 32ms
+select sum(lci), sum(uci) from (select poisson_ci2(value,1) as lci, poisson_ci2(value,2) as uci from generate_series(1.0,10000.0,1.0)) as t; -- 1.6s
+select sum(lci), sum(uci) from poisson_ci3((select value from generate_series(1.0,10000.0,1.0))); -- 790ms
+select sum(lci), sum(uci) from poisson_ci4((select value from generate_series(1.0,10000.0,1.0))); -- 1.1s?? SLOW
+
+drop table test;
+create table test as select * from poisson_ci4((select value from generate_series(1.0,10000.0,1.0))); -- 1.2s
+drop table test;
+
+select poisson_ci(10,1) as lci, poisson_ci(10,2); -- ok
+explain select poisson_ci(value,1) as lci from generate_series(10.0,12.0,1.0); -- no!
+select poisson_ci(value,2) as uci from generate_series(10.0,12.0,1.0); -- ok
+select poisson_ci(value,1,0.95) as lci, poisson_ci(value,2,0.95) as uci from generate_series(10.0,11.0,1.0); -- ??
+select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_series(10.0,11.0,1.0); -- ??
+select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value) as x;
+select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value union select 11 as value) as x;
+
+explain select poisson_ci(value,1,0.95) as lci, poisson_ci(value,2,0.95) as uci from generate_series(10.0,11.0,1.0);
+explain select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_series(10.0,11.0,1.0);
+explain select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value union select 11 as value) as x;
+
+select * from poisson_ci3(10); 
+select * from poisson_ci4(10); 
+select * from poisson_ci3((select value from generate_series(1.0,10.0,1.0)));
+select * from poisson_ci4((select value from generate_series(0.0,10.0,1.0)));   
+
+explain select sum(poisson_ci(value,1)), sum(poisson_ci(value,2)) from generate_series(1.0,10000.0,1.0);
+explain select * from poisson_ci4((select value from generate_series(0.0,10000.0,1.0)));
+explain create table test as select * from poisson_ci4((select value from generate_series(1.0,10000.0,1.0)));
+
+with t as (select * from generate_series(1.0,10.0,1.0))
+select * from poisson_ci4((select value from t)) union select * from t;

@@ -248,6 +248,3 @@ returns double begin return poisson_test(x,t,r,2); end;
 
 create function sys.poisson_test(x double, t double)
 returns double begin return poisson_test(x,t,1.0,2); end;
-
--- create function sys.rnorm(n integer, mean double, sd double)
--- returns double external name batrmath."rnorm";

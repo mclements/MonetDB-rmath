@@ -95,6 +95,7 @@ address bat_rmath_bats_$2
 comment "$1";
 ')
 
+# unsafe functions
 define(`UFUNCTION0',`unsafe command rmath.$2():dbl
 address rmath_$2
 comment "$1";
