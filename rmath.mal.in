@@ -63,11 +63,11 @@ comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7]):bat[:dbl]
 address bat_rmath_bats_$2
 comment "$1";
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7):bat[:dbl]
-# third := algebra.project($4,$8:$7);
-# out := batrmath.$2($4,$6,third);
-# return out;
-# end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7):bat[:dbl];
+third :bat[:7] := algebra.project($4,$8:$7);
+out :bat[:dbl] := batrmath.$2($4,$6,third);
+return out;
+end;
 ')
 define(`FUNCTION4',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9):dbl
 address rmath_$2
@@ -78,17 +78,17 @@ comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9]):bat[:dbl]
 address bat_rmath_bats_$2
 comment "$1";
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9):bat[:dbl]
-# third := algebra.project($4,$8:$7);
-# fourth := algebra.project($4,$10:$9);
-# out := batrmath.$2($4,$6,third,fourth);
-# return out;
-# end;
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9):bat[:dbl]
-# fourth := algebra.project($4,$10:$9);
-# out := batrmath.$2($4,$6,$8,fourth);
-# return out;
-# end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9):bat[:dbl];
+third :bat[:$7] := algebra.project($4,$8:$7);
+fourth :bat[:$9] := algebra.project($4,$10:$9);
+out :bat[:dbl] := batrmath.$2($4,$6,third,fourth);
+return out;
+end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9):bat[:dbl];
+fourth :bat[:$9] := algebra.project($4,$10:$9);
+out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth);
+return out;
+end;
 ')
 define(`FUNCTION5',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11):dbl
 address rmath_$2
@@ -99,24 +99,24 @@ comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11]):bat[:dbl]
 address bat_rmath_bats_$2
 comment "$1";
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9,$12:$11):bat[:dbl]
-# third := algebra.project($4,$8:$7);
-# fourth := algebra.project($4,$10:$9);
-# fifth := algebra.project($4,$12:$11);
-# out := batrmath.$2($4,$6,third,fourth,fifth);
-# return out;
-# end;
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9,$12:$11):bat[:dbl]
-# fourth := algebra.project($4,$10:$9);
-# fifth := algebra.project($4,$12:$11);
-# out := batrmath.$2($4,$6,$8,fourth,fifth);
-# return out;
-# end;
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:$11):bat[:dbl]
-# fifth := algebra.project($4,$12:$11);
-# out := batrmath.$2($4,$6,$8,$10,fifth);
-# return out;
-# end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9,$12:$11):bat[:dbl];
+third :bat[$7] := algebra.project($4,$8:$7);
+fourth :bat[:$9] := algebra.project($4,$10:$9);
+fifth :bat[:$11] := algebra.project($4,$12:$11);
+out :bat[:dbl] := batrmath.$2($4,$6,third,fourth,fifth);
+return out;
+end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9,$12:$11):bat[:dbl];
+fourth :bat[:$9] := algebra.project($4,$10:$9);
+fifth :bat[:$11] := algebra.project($4,$12:$11);
+out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth,fifth);
+return out;
+end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:$11):bat[:dbl];
+fifth :bat[:$11] := algebra.project($4,$12:$11);
+out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,fifth);
+return out;
+end;
 ')
 
 define(`FUNCTION6',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):dbl
@@ -128,32 +128,32 @@ comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11],$14:bat[:$13]):bat[:dbl]
 address bat_rmath_bats_$2
 comment "$1";
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9,$12:$11,$14:$13):bat[:dbl]
-# third := algebra.project($4,$8:$7);
-# fourth := algebra.project($4,$10:$9);
-# fifth := algebra.project($4,$12:$11);
-# sixth := algebra.project($4,$14:$13);
-# out := batrmath.$2($4,$6,third,fourth,fifth,sixth);
-# return out;
-# end;
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9,$12:$11,$14:$13):bat[:dbl]
-# fourth := algebra.project($4,$10:$9);
-# fifth := algebra.project($4,$12:$11);
-# sixth := algebra.project($4,$14:$13);
-# out := batrmath.$2($4,$6,$8,fourth,fifth,sixth);
-# return out;
-# end;
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:$11,$14:$13):bat[:dbl]
-# fifth := algebra.project($4,$12:$11);
-# sixth := algebra.project($4,$14:$13);
-# out := batrmath.$2($4,$6,$8,$10,fifth,sixth);
-# return out;
-# end;
-# function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11],$14:$13):bat[:dbl]
-# sixth := algebra.project($4,$14:$13);
-# out := batrmath.$2($4,$6,$8,$10,$12,sixth);
-# return out;
-# end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9,$12:$11,$14:$13):bat[:dbl];
+third :bat[$7] := algebra.project($4,$8:$7);
+fourth :bat[$9] := algebra.project($4,$10:$9);
+fifth :bat[$11] := algebra.project($4,$12:$11);
+sixth :bat[$13] := algebra.project($4,$14:$13);
+out :bat[:dbl] := batrmath.$2($4,$6,third,fourth,fifth,sixth);
+return out;
+end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9,$12:$11,$14:$13):bat[:dbl];
+fourth :bat[$9] := algebra.project($4,$10:$9);
+fifth :bat[$11] := algebra.project($4,$12:$11);
+sixth :bat[$13] := algebra.project($4,$14:$13);
+out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth,fifth,sixth);
+return out;
+end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:$11,$14:$13):bat[:dbl];
+fifth :bat[$11] := algebra.project($4,$12:$11);
+sixth :bat[$13] := algebra.project($4,$14:$13);
+out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,fifth,sixth);
+return out;
+end;
+function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11],$14:$13):bat[:dbl];
+sixth :bat[$13] := algebra.project($4,$14:$13);
+out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,$12,sixth);
+return out;
+end;
 ')
 
 # unsafe functions

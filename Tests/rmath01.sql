@@ -85,7 +85,12 @@ drop function poisson_ci2(double,integer);
 create function poisson_ci2(y double,boundary integer) returns double language r {sapply(y,function(yi) poisson.test(yi)$conf.int[boundary])};
 -- table returning function using R
 drop function poisson_ci3(double);
-create function poisson_ci3(y double) returns table (lci double, uci double) language r {val = t(sapply(y,function(yi) {poisson.test(yi)$conf.int})); data.frame(lci=val[,1],uci=val[,2])};
+create function poisson_ci3(y double) returns table (lci double, uci double) language r {val = t(sapply(y,function(yi) {test = poisson.test(yi)})); data.frame(lci=val[,1],uci=val[,2])};
+drop function poisson_test2(double,double);
+create function poisson_test2(y double,e double) returns double language r {mapply(function(yi,ei) poisson.test(yi,ei)$p.value,y,e)};
+drop function poisson_test3(double,double);
+create function poisson_test3(y double,e double) returns table(lci double, uci double, pvalue double) language r {data.frame(t(mapply(function(yi,ei) {test=poisson.test(yi,ei); c(lci=test$conf.int[1], uci=test$conf.int[2], pvalue=test$p.value)},y,e)))};
+select poisson_test3(10,12).*;
 -- table returning function using C code
 drop function poisson_ci4(double);
 create function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select poisson_ci(y,1) as lci, poisson_ci(y,2) as uci); end;
@@ -94,13 +99,26 @@ drop function poisson_ci5(double);
 create function poisson_ci5(y double) returns table (lci double, uci double) language r {alpha=0.025; data.frame(lci=ifelse(y==0,0,qgamma(alpha,y)), uci=qgamma(1-alpha,y+1))};
 
 drop table vals;
-create table vals as select cast(value as double) as value from generate_series(1.0,10000.0,1.0);
-select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from vals) as t; -- 32ms FASTEST (slightly faster than vectorised R)
-select sum(lci), sum(uci) from (select poisson_ci2(value,1) as lci, poisson_ci2(value,2) as uci from vals) as t; -- 1.6s
+create table vals as select cast(value as double) as value, cast(value as double)*1.1 as value2, 1.0 as r, 2 as alt  from generate_series(1.0,10001.0,1.0);
+select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from vals) as t; -- 28ms FASTEST (slightly faster than vectorised R)
+select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci2(value,1) as lci, poisson_ci2(value,2) as uci, poisson_test2(value,1.1*value) as pvalue from vals) as t; -- 1.6s
+select sum(lci), sum(uci), sum(pvalue) from poisson_test3(select value,1.1*value from vals);
 select sum(lci), sum(uci) from poisson_ci3((select value from vals)); -- 790ms
 select sum(lci), sum(uci) from poisson_ci4((select value from vals)); -- 1.1s?? SLOW
 select sum(lci), sum(uci) from poisson_ci5((select value from vals)); -- 40ms FAST
 select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2; -- 1.3s SLOW (lateral)
+
+select sum(poisson_test(value,value*1.1,1.0,2)) from vals; 
+select sum(poisson_test(value,value2)) from vals; 
+select sum(poisson_test(value,5000)) from vals; 
+select sum(poisson_test2(value,value2)) from vals; 
+
+with vals2 as (select value, value*1.1 as value2, 1.0 as r, 2 as alt from vals) select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value2,r,alt) as pvalue from vals2) as t; -- ok (slow)
+
+explain select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value*1.1) as pvalue from vals) as t;
+explain select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value*1.1,1.0,2) as pvalue from vals) as t;
+explain with vals2 as (select value, value*1.1 as value2, 1.0 as r, 2 as alt from vals) select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value2,r,alt) as pvalue from vals2) as t;
+
 
 drop table test;
 create table test as select * from poisson_ci4((select value from generate_series(1.0,10000.0,1.0))); -- 1.2s
@@ -114,10 +132,75 @@ select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_seri
 select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value) as x;
 select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value union select 11 as value) as x;
 
+drop table vals;
+create table vals as select cast(value as double) as generate_series from generate_series(1.0,10.0,1.0);
 explain select poisson_ci(value,1,0.95) as lci, poisson_ci(value,2,0.95) as uci from generate_series(10.0,11.0,1.0);
 explain select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_series(10.0,11.0,1.0);
 explain select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value union select 11 as value) as x;
-explain select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2;
+explain select *  from vals, lateral poisson_ci4(vals.value) as t2;
+
+
+drop function trf1(double); 
+create function trf1(x double) returns table(a double, b double)
+  begin
+    return table(select x as a, 2*x as b);
+  end;
+select * from trf1(cast(2.0 as double)); -- ok
+select * from generate_series(0.0,5.0,1.0) as t, lateral trf1(cast(t.value as double)) as t2;
+
+
+
+-- example of using a random numbers from R
+-- R: unsigned <- function(seed) ifelse(seed < 0, seed + 2^32, seed)
+-- R: signed <- function(seed) ifelse(seed>2^31, seed-2^32, seed)
+drop function rpois2(double,double);
+drop function set_seed2(integer);
+drop function get_seed3();
+drop procedure set_seed();
+drop procedure save_seed();
+drop aggregate set_seed3(integer);
+drop table r_random_seed;
+drop table r_random_seed_test;
+--
+create function rpois2(n double, mu double) returns table(y int) language r {data.frame(y=rpois(n,mu))};
+create function set_seed2(seed integer) returns boolean language r { set.seed(seed); TRUE };
+create function get_seed3() returns table(seed int) language r { data.frame(seed=.Random.seed)};
+create aggregate set_seed3(seed integer) returns boolean language r { .Random.seed <<- ifelse(seed<0,seed+2^32,seed) ; TRUE};
+create table r_random_seed (seed integer);
+create table r_random_seed_test (result boolean);
+create procedure save_seed()
+  begin
+    delete from r_random_seed;
+    insert into r_random_seed select seed from get_seed3();
+  end;
+create procedure set_seed()
+  begin
+    delete from r_random_seed_test;
+    insert into r_random_seed_test select set_seed3(seed) from r_random_seed;
+  end;
+select set_seed2(10);
+select * from rpois2(5.0,10.0);
+select set_seed2(10);
+select * from rpois2(5.0,10.0);
+select set_seed2(10);
+call save_seed();
+call set_seed();
+select * from rpois2(5.0,10.0); -- ?? 
+call set_seed();
+select * from rpois2(5.0,10.0); -- ??
+
+-- select * from generate_series(0.0,10.0,1.0) as g, lateral rpois(g.value);
+select * from generate_series(0.0,10.0,1.0) as g, rpois(g.value);
+
+drop table vals;
+create table vals as select cast(value as double) as value from generate_series(1.0,10.0,1.0);
+select * from vals; -- ok
+select poisson_ci4(10.0).*; -- ok
+select poisson_ci4(value).* from vals; -- fails: identifier 'value' unknown
+create table vals2 as select * from vals, lateral poisson_ci4(vals.value) as t2; -- ok (slow iteration)
+
+explain select * from poisson_ci4((select value from vals));
+
 
 
 drop table test;

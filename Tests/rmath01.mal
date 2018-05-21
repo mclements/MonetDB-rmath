@@ -1,0 +1,74 @@
+function testing(x:bat[:dbl],t:bat[:dbl]):bat[:dbl];
+r :bat[:dbl] := algebra.project(x,1:dbl);
+alt :bat[:int] := algebra.project(x,2:int);
+out :bat[:dbl] := batrmath.poisson_test(x,t,r,alt);
+return out;
+end;
+
+y := bat.new(nil:dbl);
+y := bat.append(y,10.0:dbl);
+y := bat.append(y,11.0:dbl);
+t := bat.new(nil:dbl);
+t := bat.append(t,10.0:dbl);
+t := bat.append(t,10.0:dbl);
+r :bat[:dbl] := algebra.project(y, 1.0:dbl);
+alt :bat[:int] := algebra.project(y, 2:int);
+io.print(y);
+io.print(t);
+io.print(r);
+io.print(alt);
+test := batrmath.poisson_test(y,t,r,alt); # ok
+io.print(test);
+test := batrmath.poisson_test(y,t,1.0:dbl,2:int); # error: Recursive call limit reached
+io.print(test);
+test := testing(y,t); # ok
+io.print(test);
+
+
+function poisson_ci5(y:bat[:dbl])(lci:bat[:dbl], uci:bat[:dbl]);
+ci1 := batrmath.poisson_ci(y,1:int,0.95:dbl);
+ci2 := batrmath.poisson_ci(y,2:int,0.95:dbl);
+lnames:bat[:str] := bat.new(nil:str);
+names:bat[:str] := bat.new(nil:str);
+types:bat[:str] := bat.new(nil:str);
+inta:bat[:int] := bat.new(nil:int);
+intb:bat[:int] := bat.new(nil:int);
+lnames := bat.append(lnames, ".L1":str);
+lnames := bat.append(lnames, ".L1":str);
+names := bat.append(names, "lci":str);
+names := bat.append(names, "uci":str);
+types := bat.append(types, "double":str);
+types := bat.append(types, "double":str);
+inta := bat.append(inta, 53:int);
+inta := bat.append(inta, 53:int);
+intb := bat.append(inta, 0:int);
+intb := bat.append(inta, 0:int);
+return sql.resultSet(lnames,names,types,inta,intb,ci1,ci2);
+end poisson_ci5;
+
+function poisson_ci5(y:bat[:dbl])(lci:bat[:dbl], uci:bat[:dbl]);
+ci1 := batrmath.poisson_ci(y,1:int,0.95:dbl);
+ci2 := batrmath.poisson_ci(y,2:int,0.95:dbl);
+return (ci1,ci2);
+end poisson_ci5;
+
+y:bat[:dbl] := bat.new(nil:dbl);
+y := bat.append(y,10.0:dbl);
+y := bat.append(y,11.0:dbl);
+io.print(y);
+
+(lci:bat[:dbl],uci:bat[:dbl]) := poisson_ci5(y); 
+io.print(lci);
+io.print(uci);
+
+u := poisson_ci5(y); 
+io.print(u);
+
+
+z:(lci:bat[:dbl], uci:bat[:dbl]); 
+z := batrmath.poisson_ci5(y);
+
+z := rmath.poisson_ci(10:dbl, 1:int, 0.95:dbl);
+io.print(z);
+z := rmath.poisson_ci(10:dbl, 2:int, 0.95:dbl);
+io.print(z);

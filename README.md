@@ -61,7 +61,7 @@ select rpois(100) from sys.generate_series(1,3);  -- repeats the values:-<
 +--------------------------+
 ```
 
-All of the functions are currently scalars. Next steps include adding BAT functions, including some of the constants at the beginning of [Rmath.h](http://docs.rexamine.com/R-devel/Rmath_8h_source.html), and adding some statistical tests. As examples, I have included: `poisson_ci(y,boundary)` for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%; and `poisson_test(y,t)` for count y and time exposed t, with the null hypothesis that y/t=1:
+All of the functions are currently scalars. Next steps include adding BAT functions, including some of the constants at the beginning of [Rmath.h](http://docs.rexamine.com/R-devel/Rmath_8h_source.html), and adding some statistical tests. As examples, I have included: `poisson_ci(y,boundary)` for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%; and `poisson_test(y,t)` for count y and time exposed t, with the default null hypothesis that y/t=1:
 
 ``` SQL
 select 10.0/9 as rate_ratio, poisson_ci(10,1)/9 as lci, poisson_ci(10,2)/9 as uci, poisson_test(10,9) as pvalue;
