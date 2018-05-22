@@ -181,6 +181,14 @@ select * from rpois2(5.0,10.0); -- ??
 call set_seed();
 select * from rpois2(5.0,10.0); -- ??
 
+create function set_random_seed(seed integer)
+  returns boolean language r { set.seed(seed); TRUE };
+create function rpois(n integer, mu double)
+  returns table(y integer) language r {data.frame(y=rpois(n,mu))};
+select set_random_seed(10);
+select * from rpois(5,10);
+
+
 -- select * from generate_series(0.0,10.0,1.0) as g, lateral rpois(g.value);
 select * from generate_series(0.0,10.0,1.0) as g, rpois(g.value);
 

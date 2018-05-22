@@ -2,7 +2,7 @@
 
 # MonetDB-rmath: MonetDB extension to use the Rmath library.
 
-An early version for MonetDB-rmath is now available. It includes approximately 90% of the functions in [Rmath.h](http://docs.rexamine.com/R-devel/Rmath_8h_source.html), including [rpdq] (norm|unif|gamma|beta|lnorm|chisq|nchisq|f|t|binom|cauchy|exp|geom|hyper|nbinom|pois|weibull|logis|wilcox|signrank) and another 40 functions. The current implementation uses m4 for code generation and requires the r-mathlib package under Debian.
+An early version for MonetDB-rmath is now available. It includes approximately 90% of the functions in [Rmath.h](http://docs.rexamine.com/R-devel/Rmath_8h_source.html), including [rpdq] (norm|unif|gamma|beta|lnorm|chisq|nchisq|f|t|binom|cauchy|exp|geom|hyper|nbinom|pois|weibull|logis|wilcox|signrank) and another 65 functions. The current implementation uses [m4](https://www.gnu.org/software/m4/m4.html) for code generation and requires the r-mathlib package under Debian.
 
 One can clone the GitHub repository and install using:
 ``` bash
@@ -61,7 +61,28 @@ select rpois(100) from sys.generate_series(1,3);  -- repeats the values:-<
 +--------------------------+
 ```
 
-All of the functions are currently scalars. Next steps include adding BAT functions, including some of the constants at the beginning of [Rmath.h](http://docs.rexamine.com/R-devel/Rmath_8h_source.html), and adding some statistical tests. As examples, I have included: `poisson_ci(y,boundary)` for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%; and `poisson_test(y,t)` for count y and time exposed t, with the default null hypothesis that y/t=1:
+For the last example, a better approach would be to use [embedded R](https://www.monetdb.org/content/embedded-r-monetdb); continuing the example:
+
+``` R
+create function set_random_seed(seed integer)
+  returns boolean language r { set.seed(seed); TRUE };
+create function rpois(n integer, mu double)
+  returns table(y integer) language r {data.frame(y=rpois(n,mu))};
+select set_random_seed(10);
+select * from rpois(5,10);
+
+>+------+
+| y    |
++======+
+|   10 |
+|    9 |
+|    5 |
+|    8 |
+|    9 |
++------+
+```
+
+The functions allow for arguments that are scalars and BATs. Combinations of BATs and scalars are also supported when the BATs are the earlier arguments. The next step is to add further statistical tests. As examples, I have included: `poisson_ci(y,boundary)` for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%; and `poisson_test(y,t)` for count y and time exposed t, with the default null hypothesis that y/t=1:
 
 ``` SQL
 select 10.0/9 as rate_ratio, poisson_ci(10,1)/9 as lci, poisson_ci(10,2)/9 as uci, poisson_test(10,9) as pvalue;
