@@ -30,199 +30,230 @@ FUNCTION5($1 probability density function,d$2,dbl,p,dbl,$3,dbl,$4,dbl,$5,int,log
 UFUNCTION3($1 random numbers,r$2,dbl,$3,dbl,$4,dbl,$5)
 ')
 
+define(`CONSTANTFUN',`# $1
+function rmath.$2():dbl;
+  value :dbl := $3;
+  return value;
+end;
+')
 define(`FUNCTION0',`command rmath.$2():dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 command batrmath.$2():bat[:dbl]
-address batrmath_$2
-comment "$1";
+  address batrmath_$2
+  comment "$1";
 ')
 define(`FUNCTION1',`command rmath.$2($4:$3):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3]):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 ')
 define(`FUNCTION2',`command rmath.$2($4:$3,$6:$5):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:$5):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 ')
 define(`FUNCTION3',`command rmath.$2($4:$3,$6:$5,$8:$7):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:$5,$8:$7):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7):bat[:dbl];
-third :bat[:7] := algebra.project($4,$8:$7);
-out :bat[:dbl] := batrmath.$2($4,$6,third);
-return out;
+  third :bat[:7] := algebra.project($4,$8:$7);
+  out :bat[:dbl] := batrmath.$2($4,$6,third);
+  return out;
 end;
 ')
 define(`FUNCTION4',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:$5,$8:$7,$10:$9):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9):bat[:dbl];
-third :bat[:$7] := algebra.project($4,$8:$7);
-fourth :bat[:$9] := algebra.project($4,$10:$9);
-out :bat[:dbl] := batrmath.$2($4,$6,third,fourth);
-return out;
+  third :bat[:$7] := algebra.project($4,$8:$7);
+  fourth :bat[:$9] := algebra.project($4,$10:$9);
+  out :bat[:dbl] := batrmath.$2($4,$6,third,fourth);
+  return out;
 end;
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9):bat[:dbl];
-fourth :bat[:$9] := algebra.project($4,$10:$9);
-out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth);
-return out;
+  fourth :bat[:$9] := algebra.project($4,$10:$9);
+  out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth);
+  return out;
 end;
 ')
 define(`FUNCTION5',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:$5,$8:$7,$10:$9,$12:$11):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9,$12:$11):bat[:dbl];
-third :bat[$7] := algebra.project($4,$8:$7);
-fourth :bat[:$9] := algebra.project($4,$10:$9);
-fifth :bat[:$11] := algebra.project($4,$12:$11);
-out :bat[:dbl] := batrmath.$2($4,$6,third,fourth,fifth);
-return out;
+  third :bat[$7] := algebra.project($4,$8:$7);
+  fourth :bat[:$9] := algebra.project($4,$10:$9);
+  fifth :bat[:$11] := algebra.project($4,$12:$11);
+  out :bat[:dbl] := batrmath.$2($4,$6,third,fourth,fifth);
+  return out;
 end;
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9,$12:$11):bat[:dbl];
-fourth :bat[:$9] := algebra.project($4,$10:$9);
-fifth :bat[:$11] := algebra.project($4,$12:$11);
-out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth,fifth);
-return out;
+  fourth :bat[:$9] := algebra.project($4,$10:$9);
+  fifth :bat[:$11] := algebra.project($4,$12:$11);
+  out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth,fifth);
+  return out;
 end;
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:$11):bat[:dbl];
-fifth :bat[:$11] := algebra.project($4,$12:$11);
-out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,fifth);
-return out;
+  fifth :bat[:$11] := algebra.project($4,$12:$11);
+  out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,fifth);
+  return out;
 end;
 ')
 
 define(`FUNCTION6',`command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11],$14:bat[:$13]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7,$10:$9,$12:$11,$14:$13):bat[:dbl];
-third :bat[$7] := algebra.project($4,$8:$7);
-fourth :bat[$9] := algebra.project($4,$10:$9);
-fifth :bat[$11] := algebra.project($4,$12:$11);
-sixth :bat[$13] := algebra.project($4,$14:$13);
-out :bat[:dbl] := batrmath.$2($4,$6,third,fourth,fifth,sixth);
-return out;
+  third :bat[$7] := algebra.project($4,$8:$7);
+  fourth :bat[$9] := algebra.project($4,$10:$9);
+  fifth :bat[$11] := algebra.project($4,$12:$11);
+  sixth :bat[$13] := algebra.project($4,$14:$13);
+  out :bat[:dbl] := batrmath.$2($4,$6,third,fourth,fifth,sixth);
+  return out;
 end;
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:$9,$12:$11,$14:$13):bat[:dbl];
-fourth :bat[$9] := algebra.project($4,$10:$9);
-fifth :bat[$11] := algebra.project($4,$12:$11);
-sixth :bat[$13] := algebra.project($4,$14:$13);
-out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth,fifth,sixth);
-return out;
+  fourth :bat[$9] := algebra.project($4,$10:$9);
+  fifth :bat[$11] := algebra.project($4,$12:$11);
+  sixth :bat[$13] := algebra.project($4,$14:$13);
+  out :bat[:dbl] := batrmath.$2($4,$6,$8,fourth,fifth,sixth);
+  return out;
 end;
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:$11,$14:$13):bat[:dbl];
-fifth :bat[$11] := algebra.project($4,$12:$11);
-sixth :bat[$13] := algebra.project($4,$14:$13);
-out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,fifth,sixth);
-return out;
+  fifth :bat[$11] := algebra.project($4,$12:$11);
+  sixth :bat[$13] := algebra.project($4,$14:$13);
+  out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,fifth,sixth);
+  return out;
 end;
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11],$14:$13):bat[:dbl];
-sixth :bat[$13] := algebra.project($4,$14:$13);
-out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,$12,sixth);
-return out;
+  sixth :bat[$13] := algebra.project($4,$14:$13);
+  out :bat[:dbl] := batrmath.$2($4,$6,$8,$10,$12,sixth);
+  return out;
 end;
 ')
 
 # unsafe functions
 define(`UFUNCTION0',`unsafe command rmath.$2():dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 unsafe command batrmath.$2():bat[:dbl]
-address batrmath_$2
-comment "$1";
+  address batrmath_$2
+  comment "$1";
 ')
 define(`UFUNCTION1',`unsafe command rmath.$2($4:$3):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3]):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 ')
 define(`UFUNCTION2',`unsafe command rmath.$2($4:$3,$6:$5):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:$5):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:bat[:$5]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 ')
 define(`UFUNCTION3',`unsafe command rmath.$2($4:$3,$6:$5,$8:$7):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:$5,$8:$7):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 ')
 define(`UFUNCTION4',`unsafe command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:$5,$8:$7,$10:$9):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 ')
 define(`UFUNCTION5',`unsafe command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:$5,$8:$7,$10:$9,$12:$11):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 ')
 define(`UFUNCTION6',`unsafe command rmath.$2($4:$3,$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):dbl
-address rmath_$2
-comment "$1";
+  address rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:$5,$8:$7,$10:$9,$12:$11,$14:$13):bat[:dbl]
-address bat_rmath_$2
-comment "$1";
+  address bat_rmath_$2
+  comment "$1";
 unsafe command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7],$10:bat[:$9],$12:bat[:$11],$14:bat[:$13]):bat[:dbl]
-address bat_rmath_bats_$2
-comment "$1";
+  address bat_rmath_bats_$2
+  comment "$1";
 ')
 
 divert(`1')
+
+CONSTANTFUN(e,M_E,2.718281828459045235360287471353)
+CONSTANTFUN(log2(e),M_LOG2E,1.442695040888963407359924681002)
+CONSTANTFUN(log10(e),M_LOG10E,0.434294481903251827651128918917)
+CONSTANTFUN(ln(2),M_LN2,0.693147180559945309417232121458)
+CONSTANTFUN(ln(10),M_LN10,2.302585092994045684017991454684)
+CONSTANTFUN(pi,M_PI,3.141592653589793238462643383280)
+CONSTANTFUN(2*pi,M_2PI,6.283185307179586476925286766559)
+CONSTANTFUN(pi/2,M_PI_2,1.570796326794896619231321691640)
+CONSTANTFUN(pi/4,M_PI_4,0.785398163397448309615660845820)
+CONSTANTFUN(1/pi,M_1_PI,0.318309886183790671537767526745)
+CONSTANTFUN(2/pi,M_2_PI,0.636619772367581343075535053490)
+CONSTANTFUN(2/sqrt(pi),M_2_SQRTPI,1.128379167095512573896158903122)
+CONSTANTFUN(sqrt(2),M_SQRT2,1.414213562373095048801688724210)
+CONSTANTFUN(1/sqrt(2),M_SQRT1_2,0.707106781186547524400844362105)
+CONSTANTFUN(sqrt(3),M_SQRT_3,1.732050807568877293527446341506)
+CONSTANTFUN(sqrt(32),M_SQRT_32,5.656854249492380195206754896838)
+CONSTANTFUN(log10(2),M_LOG10_2,0.301029995663981195213738894724)
+CONSTANTFUN(sqrt(pi),M_SQRT_PI,1.772453850905516027298167483341)
+CONSTANTFUN(1/sqrt(2pi),M_1_SQRT_2PI,0.398942280401432677939946059934)
+CONSTANTFUN(sqrt(2/pi),M_SQRT_2dPI,0.797884560802865355879892119869)
+CONSTANTFUN(log(2*pi),M_LN_2PI,1.837877066409345483560659472811)
+CONSTANTFUN(log(pi)/2,M_LN_SQRT_PI,0.572364942924700087071713675677)
+CONSTANTFUN(log(2*pi)/2,M_LN_SQRT_2PI,0.918938533204672741780329736406)
+CONSTANTFUN(log(pi/2)/2,M_LN_SQRT_PId2,0.225791352644727432363097614947)
 
 FUNCTION2(R_pow function,R_pow,dbl,x,dbl,y)
 FUNCTION2(R_pow_di function,R_pow_di,dbl,x,int,y)
@@ -335,5 +366,3 @@ FUNCTION1(ftrunc,ftrunc,dbl,x)
 
 FUNCTION3(Exact Poisson confidence interval,poisson_ci,dbl,x,int,boundary,dbl,conflevel)
 FUNCTION4(Poisson test,poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
-
-
