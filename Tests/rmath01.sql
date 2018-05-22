@@ -86,38 +86,30 @@ create function poisson_ci2(y double,boundary integer) returns double language r
 -- table returning function using R
 drop function poisson_ci3(double);
 create function poisson_ci3(y double) returns table (lci double, uci double) language r {val = t(sapply(y,function(yi) {test = poisson.test(yi)})); data.frame(lci=val[,1],uci=val[,2])};
-drop function poisson_test2(double,double);
-create function poisson_test2(y double,e double) returns double language r {mapply(function(yi,ei) poisson.test(yi,ei)$p.value,y,e)};
-drop function poisson_test3(double,double);
-create function poisson_test3(y double,e double) returns table(lci double, uci double, pvalue double) language r {data.frame(t(mapply(function(yi,ei) {test=poisson.test(yi,ei); c(lci=test$conf.int[1], uci=test$conf.int[2], pvalue=test$p.value)},y,e)))};
-select poisson_test3(10,12).*;
 -- table returning function using C code
 drop function poisson_ci4(double);
 create function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select poisson_ci(y,1) as lci, poisson_ci(y,2) as uci); end;
 -- vectorised R code
 drop function poisson_ci5(double);
 create function poisson_ci5(y double) returns table (lci double, uci double) language r {alpha=0.025; data.frame(lci=ifelse(y==0,0,qgamma(alpha,y)), uci=qgamma(1-alpha,y+1))};
+--
+drop function poisson_test2(double,double);
+create function poisson_test2(y double,e double) returns double language r {mapply(function(yi,ei) poisson.test(yi,ei)$p.value,y,e)};
+drop function poisson_test3(double,double);
+create function poisson_test3(y double,e double) returns table(lci double, uci double, pvalue double) language r {data.frame(t(mapply(function(yi,ei) {test=poisson.test(yi,ei); c(lci=test$conf.int[1], uci=test$conf.int[2], pvalue=test$p.value)},y,e)))};
+select poisson_test3(10,12).*;
 
 drop table vals;
 create table vals as select cast(value as double) as value, cast(value as double)*1.1 as value2, 1.0 as r, 2 as alt  from generate_series(1.0,10001.0,1.0);
 select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from vals) as t; -- 28ms FASTEST (slightly faster than vectorised R)
-select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci2(value,1) as lci, poisson_ci2(value,2) as uci, poisson_test2(value,1.1*value) as pvalue from vals) as t; -- 1.6s
-select sum(lci), sum(uci), sum(pvalue) from poisson_test3(select value,1.1*value from vals);
+select sum(poisson_ci2(value,1)), sum(poisson_ci2(value,2)) from vals; -- 1.6s
 select sum(lci), sum(uci) from poisson_ci3((select value from vals)); -- 790ms
 select sum(lci), sum(uci) from poisson_ci4((select value from vals)); -- 1.1s?? SLOW
 select sum(lci), sum(uci) from poisson_ci5((select value from vals)); -- 40ms FAST
 select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2; -- 1.3s SLOW (lateral)
-
-select sum(poisson_test(value,value*1.1,1.0,2)) from vals; 
-select sum(poisson_test(value,value2)) from vals; 
-select sum(poisson_test(value,5000)) from vals; 
-select sum(poisson_test2(value,value2)) from vals; 
-
-with vals2 as (select value, value*1.1 as value2, 1.0 as r, 2 as alt from vals) select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value2,r,alt) as pvalue from vals2) as t; -- ok (slow)
-
-explain select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value*1.1) as pvalue from vals) as t;
-explain select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value*1.1,1.0,2) as pvalue from vals) as t;
-explain with vals2 as (select value, value*1.1 as value2, 1.0 as r, 2 as alt from vals) select sum(lci), sum(uci), sum(pvalue) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci, poisson_test(value,value2,r,alt) as pvalue from vals2) as t;
+--
+select sum(poisson_test(value,value2)) from vals; -- 5.6s
+select sum(pvalue) from poisson_test3((select value,value2 from vals)); -- 8.8s
 
 
 drop table test;
