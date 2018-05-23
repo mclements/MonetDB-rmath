@@ -26,6 +26,20 @@
 #define rmath_export extern
 #endif
 
+#define CONSTANTFUN(LABEL,NAME)						\
+  static str								\
+  rmath ## NAME(dbl *retval)						\
+  {									\
+    *retval = dbl_nil;							\
+    *retval = NAME;							\
+    return MAL_SUCCEED;							\
+  }									\
+  rmath_export str							\
+  rmath_ ## NAME(dbl *retval)						\
+  {									\
+    return rmath ## NAME(retval);					\
+  }
+
 #define FUNCTION0(NAME)							\
   static str								\
   rmath ## NAME(dbl *retval)						\
@@ -813,6 +827,30 @@
   FUNCTION5(d ## NAME,dbl,x,dbl,ARG1,dbl,ARG2,dbl,ARG3,int,log)		\
   FUNCTION3(r ## NAME,dbl,ARG1,dbl,ARG2,dbl,ARG3)				
 
+CONSTANTFUN(e,M_E)
+CONSTANTFUN(log2(e),M_LOG2E)
+CONSTANTFUN(log10(e),M_LOG10E)
+CONSTANTFUN(ln(2),M_LN2)
+CONSTANTFUN(ln(10),M_LN10)
+CONSTANTFUN(pi,M_PI)
+CONSTANTFUN(2*pi,M_2PI)
+CONSTANTFUN(pi/2,M_PI_2)
+CONSTANTFUN(pi/4,M_PI_4)
+CONSTANTFUN(1/pi,M_1_PI)
+CONSTANTFUN(2/pi,M_2_PI)
+CONSTANTFUN(2/sqrt(pi),M_2_SQRTPI)
+CONSTANTFUN(sqrt(2),M_SQRT2)
+CONSTANTFUN(1/sqrt(2),M_SQRT1_2)
+CONSTANTFUN(sqrt(3),M_SQRT_3)
+CONSTANTFUN(sqrt(32),M_SQRT_32)
+CONSTANTFUN(log10(2),M_LOG10_2)
+CONSTANTFUN(sqrt(pi),M_SQRT_PI)
+CONSTANTFUN(1/sqrt(2pi),M_1_SQRT_2PI)
+CONSTANTFUN(sqrt(2/pi),M_SQRT_2dPI)
+CONSTANTFUN(log(2*pi),M_LN_2PI)
+CONSTANTFUN(log(pi)/2,M_LN_SQRT_PI)
+CONSTANTFUN(log(2*pi)/2,M_LN_SQRT_2PI)
+CONSTANTFUN(log(pi/2)/2,M_LN_SQRT_PId2)
 FUNCTION2(R_pow,dbl,x,dbl,y)
 FUNCTION2(R_pow_di,dbl,x,int,y)
 FUNCTION0(norm_rand)
