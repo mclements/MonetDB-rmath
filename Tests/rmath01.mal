@@ -72,3 +72,10 @@ z := rmath.poisson_ci(10:dbl, 1:int, 0.95:dbl);
 io.print(z);
 z := rmath.poisson_ci(10:dbl, 2:int, 0.95:dbl);
 io.print(z);
+
+
+y := bat.new(nil:dbl);
+y := bat.append(y,10.0:dbl);
+y := bat.append(y,11.0:dbl);
+(lci:bat[:dbl],uci:bat[:dbl]) := batrmath.poisson_cis(y,0.95:dbl);
+io.print(y,lci,uci);

@@ -138,9 +138,101 @@ create function trf1(x double) returns table(a double, b double)
     return table(select x as a, 2*x as b);
   end;
 select * from trf1(cast(2.0 as double)); -- ok
-select * from generate_series(0.0,5.0,1.0) as t, lateral trf1(cast(t.value as double)) as t2;
+drop table test;
+create table test as select cast(value as double) as value from generate_series(0.0,10001.0,1.0);
+explain select sum(a), sum(b) from trf1((select value from test)) as t2;
+select sum(a), sum(b) from test, lateral trf1(test.value) as t2;
 
+select sum(a), sum(b) from trf1((select value from test)) as t2;
 
+drop function trf1(double); 
+create function trf1(x double) returns table(a double, b double)
+  begin
+    return table(select x as a, 2*x as b);
+  end;
+select * from trf1(cast(2.0 as double)); -- ok
+drop table test;
+create table test as select cast(value as double) as value from generate_series(0.0,5.0,1.0);
+select sum(a), sum(b) from trf1((select value from test)) as t2;
+select sum(a), sum(b) from test, lateral trf1(test.value) as t2;
+select sum(a), sum(b) from (select trf1(value).* from test);
+
+explain select * from
+(select *, row_number() over() as rid from test) as t1
+natural join
+(select *, row_number() over() as rid from trf1((select value from test))) as t2;
+explain select * from test, lateral trf1(test.value) as t2;
+
+-- test data
+declare cl double;
+set cl=0.95;
+create or replace table test as select cast(value as double) as value, cl as conflevel from generate_series(0.0,5.0,1.0);
+-- a scalar function *can* return multiple values
+select poisson_cis(10,cl).*; -- ok
+select * from poisson_cis(10,cl); -- ok
+-- table-returning function in FROM
+select * from poisson_cis((select value, cl from test)); -- ok
+-- use ROW_NUMBER to join the input data with the results
+select * from
+(select *, row_number() over() as rid from test) as t1
+natural join
+(select *, row_number() over() as rid from poisson_cis((select value,cl from test))) as t2; -- ok
+-- use LATERAL to join the input data with the results
+select * from test, lateral poisson_cis(test.value, cl) as t2; -- ok
+select * from test, lateral poisson_cis(test.value, test.conflevel) as t2; -- ok
+create or replace function poisson_cis2(x double, conflevel double)
+  returns table(lci double, uci double)
+  begin
+   return select poisson_ci(x,1,conflevel), poisson_ci(x,1,conflevel);
+  end;
+select poisson_cis2(10,cl).*;
+select * from poisson_cis2(10,cl);
+
+-- Errors
+select poisson_cis(test.value,cl).* from test; -- Error: no such column 'test.value'
+select poisson_cis(value,cl).* from test; -- identifier 'value' unknown
+select poisson_cis(test.value,test.conflevel).* from test; -- Error: no such column 'test.value'
+select poisson_cis(value,test.conflevel).* from test; -- identifier 'value' unknown
+select poisson_cis2(value,cl).* from test; -- Error: identifier 'value' unknown
+select poisson_cis2(test.value,cl).* from test; -- Error: no such column 'test.value'
+-- Should table-returning functions in the select statement only return one row?
+
+explain select * from poisson_cis((select value, cl from test)); -- vectorised
+explain select * from poisson_cis((select value, conflevel from test)); -- vectorised
+explain select * from
+(select *, row_number() over() as rid from test) as t1
+natural join
+(select *, row_number() over() as rid from poisson_cis((select value,conflevel from test))) as t2; -- vectorised
+explain select * from test, lateral poisson_cis(test.value, cl) as t2; -- NOT vectorised
+explain select * from test, lateral poisson_cis(test.value, test.conflevel) as t2; -- NOT vectorised
+
+explain select * from test, lateral poisson_cis(test.value, cl) as t2;
+
+-- clean example
+-- test data
+drop table test;
+create table test as select cast(value as double) as value from generate_series(0,5);
+\d test
+-- test function
+drop function cis(double,double);
+create function cis(mu double, se double) returns table(lci double, uci double)
+  begin return select mu-1.96*se, mu+1.96*se;
+  end;
+-- table-returning functions ok
+select * from cis((select value, 1.0 from test));
+-- re-join using row_number()
+select * from
+(select *, row_number() over() as rid from test) as t1
+natural join
+(select *, row_number() over() as rid from cis((select value,1.0 from test))) as t2;
+-- re-join using lateral
+select * from test, lateral cis(test.value, cast(1.0 as double)) as t2;
+-- table-returning function in select
+select cis(2,1).*; -- ok
+select cis(2,1).* from test; -- Error: no such operator 'cis'
+select cis(value,1).* from test; -- Error: identifier 'value' unknown
+-- lateral is not "vectorised" -- there would be a loop even if a BAT function were available
+-- How to better join results? (Email sent 2018-05-25)
 
 -- example of using a random numbers from R
 -- R: unsigned <- function(seed) ifelse(seed < 0, seed + 2^32, seed)

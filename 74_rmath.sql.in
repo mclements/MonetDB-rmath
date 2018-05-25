@@ -246,6 +246,10 @@ FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary
 create function sys.poisson_ci(x double, boundary integer)
 returns double begin return poisson_ci(x,boundary,0.95); end;
 
+create function sys.poisson_cis(x double, conflevel double)
+returns table(lci double, uci double)
+external name rmath."poisson_cis";
+
 -- deprecated call
 create function sys.poissonci(x double, boundary integer, conflevel double)
 returns double begin return poisson_ci(x,boundary,conflevel); end;

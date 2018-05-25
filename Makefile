@@ -38,7 +38,7 @@ install: lib_rmath.so rmath.mal 74_rmath.sql
 dist:
 	tar -c -j -f $(name)-$(version).tar.bz2 --transform "s,^,$(name)-$(version)/," `hg files -X .hgtags`
 
-run:
+sql:
 	monetdbd start ~/work/mydbfarm || true
 	monetdb destroy -f testt || true
 	monetdb create testt

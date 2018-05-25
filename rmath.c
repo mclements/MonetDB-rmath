@@ -987,6 +987,33 @@ double poisson_test(double x, double t, double r, int alternative) {
 }
 FUNCTION4(poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
 
+str
+rmath_scalar_bat_poisson_cis(bat *ret, bat *ret2, const dbl *x, const dbl *conflevel)
+{
+	BAT *a_ = COLnew(0, TYPE_dbl, 1, TRANSIENT);
+	BAT *b_ = COLnew(0, TYPE_dbl, 1, TRANSIENT);
+	if (a_ == 0 || b_ == 0) {
+		if (a_) BBPunfix(a_->batCacheid);
+		if (b_) BBPunfix(b_->batCacheid);
+		throw(MAL, "rmath.poisson_cis", SQLSTATE(HY001) MAL_MALLOC_FAIL);
+	}
+	double lci = poisson_ci(*x, 1, *conflevel);
+	double uci = poisson_ci(*x, 2, *conflevel);
+	if (BUNappend(a_, &lci, FALSE) != GDK_SUCCEED ||
+		BUNappend(b_, &uci, FALSE) != GDK_SUCCEED)
+		goto bailout;
+	*ret = a_->batCacheid;
+	BBPkeepref(a_->batCacheid);
+	*ret2 = b_->batCacheid;
+	BBPkeepref(b_->batCacheid);
+	return MAL_SUCCEED;
+  bailout:
+	BBPunfix(a_->batCacheid);
+	BBPunfix(b_->batCacheid);
+	throw(MAL, "rmath.poisson_cis", SQLSTATE(HY001) MAL_MALLOC_FAIL);
+}
+
+
 // clean up macros
 #undef FUNCTION0
 #undef FUNCTION1
