@@ -313,3 +313,106 @@ explain create table test as select * from poisson_ci4((select value from genera
 
 with t as (select * from generate_series(1.0,10.0,1.0))
 select * from poisson_ci4((select value from t)) union select * from t;
+
+drop function multiply(integer);
+CREATE FUNCTION multiply(input INTEGER) 
+RETURNS INTEGER
+LANGUAGE C {
+    result->initialize(result, input.count);
+    // loop over the input values
+    for(size_t i = 0; i < input.count; i++) {
+        if (input.is_null(input.data[i])) {
+            // handle NULL values
+            result->data[i] = result->null_value;
+        } else {
+            // handle regular values
+            result->data[i] = input.data[i] * 2;
+        }
+    }
+};
+drop table integers;
+CREATE TABLE integers(i INTEGER);
+INSERT INTO integers VALUES (1), (2), (NULL), (3), (4);
+SELECT i, multiply(i) FROM integers;
+
+drop function mult2(integer,integer);
+CREATE FUNCTION mult2(input1 INTEGER, input2 INTEGER) 
+RETURNS INTEGER
+LANGUAGE C {
+    size_t n1 = input1.count>1;
+    size_t n2 = input2.count>1;
+    size_t n = input1.count>input2.count ? input1.count : input2.count;
+    result->initialize(result, n);
+    // loop over the input values
+    for(size_t i = 0; i < n; i++) {
+        if (input1.is_null(input1.data[i*n1]) || input2.is_null(input2.data[i*n2])) {
+            // handle NULL values
+            result->data[i] = result->null_value;
+        } else {
+            // handle regular values
+            result->data[i] = input1.data[i*n1]*input2.data[i*n2];
+        }
+    }
+};
+drop table integers;
+CREATE TABLE integers(i INTEGER);
+INSERT INTO integers VALUES (1), (2), (NULL), (3), (4);
+SELECT i, mult2(i,i) FROM integers;
+SELECT i, mult2(3,i) FROM integers;
+SELECT i, mult2(i,4) FROM integers;
+SELECT i, mult2(5,4) FROM integers;
+
+explain SELECT i, mult2(i,i) FROM integers;
+explain SELECT i, mult2(3,i) FROM integers;
+explain SELECT i, mult2(i,4) FROM integers;
+explain SELECT i, mult2(5,4) FROM integers;
+
+drop function mult3(integer,integer,integer);
+CREATE FUNCTION mult3(input1 INTEGER, input2 INTEGER, input3 integer) 
+RETURNS INTEGER
+LANGUAGE C {
+    size_t n1 = input1.count>1;
+    size_t n2 = input2.count>1;
+    size_t n3 = input3.count>1;
+    size_t n = input1.count>input2.count ? input1.count : input2.count;
+    if (input3.count>n) n = input3.count;
+    result->initialize(result, n);
+    // loop over the input values
+    for(size_t i = 0; i < n; i++) {
+        if (input1.is_null(input1.data[i*n1]) ||
+	   input2.is_null(input2.data[i*n2])  ||
+	   input3.is_null(input3.data[i*n3])) {
+            // handle NULL values
+            result->data[i] = result->null_value;
+        } else {
+            // handle regular values
+            result->data[i] = input1.data[i*n1]*input2.data[i*n2]*input3.data[i*n3];
+        }
+    }
+};
+drop table integers;
+CREATE TABLE integers(i INTEGER);
+INSERT INTO integers VALUES (1), (2), (NULL), (3), (4);
+SELECT i, mult3(i,i,i) FROM integers;
+SELECT i, mult3(3,i,1) FROM integers;
+SELECT i, mult3(i,4,1) FROM integers;
+SELECT i, mult3(5,4,1) FROM integers;
+
+
+drop function myexp();
+CREATE FUNCTION myexp()
+RETURNS double
+LANGUAGE C {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS -I/usr/share/R/include
+#pragma LDFLAGS -lRmath -lm
+    result->initialize(result, 1);
+    result->data[0] = M_E;
+};
+drop table integers;
+CREATE TABLE integers(i INTEGER);
+INSERT INTO integers VALUES (1), (2), (NULL), (3), (4);
+select myexp();
+SELECT i, myexp() FROM integers;
+

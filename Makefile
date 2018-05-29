@@ -40,16 +40,17 @@ dist:
 
 sql:
 	monetdbd start ~/work/mydbfarm || true
-	monetdb destroy -f testt || true
-	monetdb create testt
-	monetdb release testt
 	mclient -d testt
 
 mal:
+	monetdbd start ~/work/mydbfarm || true
 	mclient -l mal testt
 
 start:
 	monetdbd start ~/work/mydbfarm || true
+
+stop:
+	monetdbd stop ~/work/mydbfarm || true
 
 test:
 	monetdbd start ~/work/mydbfarm || true
@@ -57,5 +58,5 @@ test:
 	monetdb create testt
 	monetdb release testt
 	monetdb set embedr=yes testt
+	monetdb set embedc=yes testt
 	mclient -d testt -s "select pnorm(1.96, 0, 1); create table temp (x double); insert into temp values (0.1); insert into temp values (0.2); select qgamma(x,2.0,1.0,1,0), qgamma(x*2,2.0,1.0,1,0) from temp; select poisson_ci(10,1), poisson_ci(10,2); select poisson_ci(value,1), poisson_ci(value,2) from (select 10 as value union select 11 as value) as t; select poisson_test(value,value*2,1.0,2) as pvalue from generate_series(cast(0.0 as double),5.0,1.0);"
-	# monetdbd stop ~/work/mydbfarm

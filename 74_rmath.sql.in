@@ -250,6 +250,10 @@ create function sys.poisson_cis(x double, conflevel double)
 returns table(lci double, uci double)
 external name rmath."poisson_cis";
 
+create function sys.poisson_cis2(x double, conflevel double)
+returns table(lci double, uci double)
+external name rmath."poisson_cis2";
+
 -- deprecated call
 create function sys.poissonci(x double, boundary integer, conflevel double)
 returns double begin return poisson_ci(x,boundary,conflevel); end;

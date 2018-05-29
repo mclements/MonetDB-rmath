@@ -1,8 +1,30 @@
+
+function my_generate_series(istart:int,istop:int):bat[:int];
+  i:int := istart;
+  out:bat[:int] := bat.new(:int);
+  barrier B := i<=istop;
+    bat.append(out,i);
+    i := i+1;
+  redo B := i<=istop;
+  return out;
+end;
+r:bat[:int] := my_generate_series(1:int,5:int);
+io.print(r);
+
+a:bat[:int] := generator.series(1:int,5:int);
+b:bat[:int] := generator.series(4:int,8:int);
+(p:bat[:oid],q:bat[:oid]):= generator.join(a,b);
+io.print(a,b);
+io.print(p);
+
+
+
+
+
 function testing(x:bat[:dbl],t:bat[:dbl]):bat[:dbl];
-r :bat[:dbl] := algebra.project(x,1:dbl);
-alt :bat[:int] := algebra.project(x,2:int);
-out :bat[:dbl] := batrmath.poisson_test(x,t,r,alt);
-return out;
+  r:bat[:dbl] := algebra.project(x,1:dbl);
+  alt:bat[:int] := algebra.project(x,2:int);
+  return out := batrmath.poisson_test(x,t,r,alt);
 end;
 
 y := bat.new(nil:dbl);

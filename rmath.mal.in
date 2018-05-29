@@ -369,28 +369,22 @@ FUNCTION4(Poisson test,poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
 command rmath.poisson_cis(x:dbl,conflevel:dbl)(:bat[:dbl],:bat[:dbl])
   address rmath_scalar_bat_poisson_cis
   comment "Exact Poisson confidence intervals";
-# function rmath.poisson_cis(x:dbl,conflevel:dbl)(lci:dbl,uci:dbl);
-#   a:dbl := rmath.poisson_ci(x,1:int,conflevel);
-#   b:dbl := rmath.poisson_ci(x,2:int,conflevel);
-#   return (lci,uci) := (a,b);
-# end;
-# function rmath.poisson_cis(x:dbl,conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
-#   lci:bat[dbl] := bat.new(:dbl);
-#   uci:bat[dbl] := bat.new(:dbl);
-#   lcii:dbl := rmath.poisson_ci(x,1:int,conflevel);
-#   ucii:dbl := rmath.poisson_ci(x,2:int,conflevel);
-#   bat.append(lci,lcii);
-#   bat.append(uci,ucii);
-#   return (lci,uci);
-# end;
-function batrmath.poisson_cis(x:bat[:dbl],conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
-  cl:bat[:dbl] := algebra.project(x,conflevel);
-  return (lci,uci) := batrmath.poisson_cis(x,cl);
-end;
 function batrmath.poisson_cis(x:bat[:dbl],conflevel:bat[:dbl])(:bat[:dbl],:bat[:dbl]);
   one:bat[:int] := algebra.project(x,1:int);
   two:bat[:int] := algebra.project(x,2:int);
   lci:bat[:dbl] := batrmath.poisson_ci(x,one,conflevel);
   uci:bat[:dbl] := batrmath.poisson_ci(x,two,conflevel);
+  return (lci,uci);
+end;
+function batrmath.poisson_cis(x:bat[:dbl],conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
+  cl:bat[:dbl] := algebra.project(x,conflevel);
+  return (lci,uci) := batrmath.poisson_cis(x,cl);
+end;
+
+function rmath.poisson_cis2(x:dbl,conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
+  lcii:dbl := rmath.poisson_ci(x,1:int,conflevel);
+  ucii:dbl := rmath.poisson_ci(x,2:int,conflevel);
+  lci:bat[:dbl] := bat.single(lcii);
+  uci:bat[:dbl] := bat.single(ucii);
   return (lci,uci);
 end;
