@@ -7,7 +7,7 @@ M4FLAGS  =
 M4SCRIPT =
 
 LIBDIR   = $(shell pkg-config --variable=libdir monetdb5)
-CFLAGS  += -g -Wall
+# CFLAGS  += -g -Wall
 CFLAGS  += $(shell pkg-config --cflags libRmath)
 LDFLAGS += $(shell pkg-config --libs libRmath)
 
@@ -48,4 +48,4 @@ test:
 	monetdb release testt
 	monetdb set embedr=yes testt
 	monetdb set embedc=yes testt
-	mclient -d testt -s "select r_pnorm(1.96, 0, 1); create table temp (x double); insert into temp values (0.1); insert into temp values (0.2); select r_qgamma(x,2.0,1.0,1,0), r_qgamma(x*2,2.0,1.0,1,0) from temp;"
+	mclient -d testt -s "select r_pnorm(1.96, 0, 1); create table temp (x double); insert into temp values (0.1); insert into temp values (0.2); select r_qgamma(x,2.0,1.0,1,0), r_qgamma(x*2,2,1) from temp;"

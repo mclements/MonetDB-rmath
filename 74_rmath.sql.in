@@ -13,6 +13,9 @@ FUNCTION4($1 cumulative density function,p$2,double,q,double,$3,integer,lower,in
 FUNCTION4($1 quantile function,q$2,double,p,double,$3,integer,lower,integer,log)
 FUNCTION3($1 probability density function,d$2,double,p,double,$3,integer,log)
 FUNCTION1($1 random numbers,r$2,double,$3)
+create function r_p$2(q double, $3 double) returns double begin return r_p$2(q, $3, 1, 0); end;
+create function r_q$2(p double, $3 double) returns double begin return r_q$2(p, $3, 1, 0); end;
+create function r_d$2(x double, $3 double) returns double begin return r_d$2(x, $3, 0); end;
 ')
 
 define(`DIST2FUNCTION',`-- $1 distribution
@@ -20,6 +23,9 @@ FUNCTION5($1 cumulative density function,p$2,double,q,double,$3,double,$4,intege
 FUNCTION5($1 quantile function,q$2,double,p,double,$3,double,$4,integer,lower,integer,log)
 FUNCTION4($1 probability density function,d$2,double,p,double,$3,double,$4,integer,log)
 FUNCTION2($1 random numbers,r$2,double,$3,double,$4)
+create function r_p$2(q double, $3 double, $4 double) returns double begin return r_p$2(q, $3, $4, 1, 0); end;
+create function r_q$2(p double, $3 double, $4 double) returns double begin return r_q$2(p, $3, $4, 1, 0); end;
+create function r_d$2(x double, $3 double, $4 double) returns double begin return r_d$2(x, $3, $4, 0); end;
 ')
 
 define(`DIST3FUNCTION',`-- $1 distribution
@@ -27,6 +33,9 @@ FUNCTION6($1 cumulative density function,p$2,double,q,double,$3,double,$4,double
 FUNCTION6($1 quantile function,q$2,double,p,double,$3,double,$4,double,$5,integer,lower,integer,log)
 FUNCTION5($1 probability density function,d$2,double,p,double,$3,double,$4,double,$5,integer,log)
 FUNCTION3($1 random numbers,r$2,double,$3,double,$4,double,$5)
+create function r_p$2(q double, $3 double, $4 double, $5 double) returns double begin return r_p$2(q, $3, $4, $5, 1, 0); end;
+create function r_q$2(p double, $3 double, $4 double, $5 double) returns double begin return r_q$2(p, $3, $4, $5, 1, 0); end;
+create function r_d$2(x double, $3 double, $4 double, $5 double) returns double begin return r_d$2(x, $3, $4, $5, 0); end;
 ')
 
 define(`FUNCTION0',`-- $1
@@ -185,6 +194,35 @@ language c {
 };
 ')
 
+define(`FUNCTION3F',`-- $1
+create function r_$2($4 $3, $6 $5, $8 $7)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    result->initialize(result, n);
+    double $9, $10, $11;
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_])) {
+            result->data[i_] = result->null_value;
+        } else {
+	    $9 = $4.data[i_*n1_];
+	    $10 = $6.data[i_*n2_];
+	    $11 = $8.data[i_*n3_]
+            result->data[i_] = $12;
+        }
+    }
+};
+')
+
+
 divert(`1')
 
 FUNCTION0(e,M_E)
@@ -321,7 +359,7 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- rmath_export double R_NegInf;
 -- rmath_export int N01_kind;
 
--- FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
+-- # FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
 -- create function rmath.poisson_ci(x double, boundary integer)
 -- returns double begin return poisson_ci(x,boundary,0.95); end;
 
@@ -342,7 +380,7 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- returns double begin return poisson_ci(x,boundary,0.95); end;
 
 -- -- alternative: 0=left, 1=right, 2=two-sided
--- FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
+-- # FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
 
 -- create function rmath.poisson_test(x double, t double, r double)
 -- returns double begin return poisson_test(x,t,r,2); end;
