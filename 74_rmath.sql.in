@@ -9,101 +9,180 @@
 
 divert(`-1')
 define(`DIST1FUNCTION',`-- $1 distribution
-create function sys.p$2(q double, $3 double, lower integer, log integer)
-returns double external name rmath."p$2";
-
-create function sys.p$2(q double, $3 double)
-returns double begin return p$2(q, $3, 1, 0); end;
-
-create function sys.q$2(p double, $3 double, lower integer, log integer)
-returns double external name rmath."q$2";
-
-create function sys.q$2(p double, $3 double)
-returns double begin return q$2(p, $3, 1, 0); end;
-
-create function sys.d$2(x double, $3 double, log integer)
-returns double external name rmath."d$2";
-
-create function sys.d$2(x double, $3 double)
-returns double begin return d$2(x, $3, 0); end;
-
-create function sys.r$2($3 double)
-returns double external name rmath."r$2";
+FUNCTION4($1 cumulative density function,p$2,double,q,double,$3,integer,lower,integer,log)
+FUNCTION4($1 quantile function,q$2,double,p,double,$3,integer,lower,integer,log)
+FUNCTION3($1 probability density function,d$2,double,p,double,$3,integer,log)
+FUNCTION1($1 random numbers,r$2,double,$3)
 ')
 
 define(`DIST2FUNCTION',`-- $1 distribution
-create function sys.p$2(q double, $3 double, $4 double, lower integer, log integer)
-returns double external name rmath."p$2";
-
-create function sys.p$2(q double, $3 double, $4 double)
-returns double begin return p$2(q, $3, $4, 1, 0); end;
-
-create function sys.q$2(p double, $3 double, $4 double, lower integer, log integer)
-returns double external name rmath."q$2";
-
-create function sys.q$2(p double, $3 double, $4 double)
-returns double begin return q$2(p, $3, $4, 1, 0); end;
-
-create function sys.d$2(x double, $3 double, $4 double, log integer)
-returns double external name rmath."d$2";
-
-create function sys.d$2(x double, $3 double, $4 double)
-returns double begin return d$2(x, $3, $4, 0); end;
-
-create function sys.r$2($3 double, $4 double)
-returns double external name rmath."r$2";
+FUNCTION5($1 cumulative density function,p$2,double,q,double,$3,double,$4,integer,lower,integer,log)
+FUNCTION5($1 quantile function,q$2,double,p,double,$3,double,$4,integer,lower,integer,log)
+FUNCTION4($1 probability density function,d$2,double,p,double,$3,double,$4,integer,log)
+FUNCTION2($1 random numbers,r$2,double,$3,double,$4)
 ')
 
 define(`DIST3FUNCTION',`-- $1 distribution
-create function sys.p$2(q double, $3 double, $4 double, $5 double, lower integer, log integer)
-returns double external name rmath."p$2";
-
-create function sys.p$2(q double, $3 double, $4 double, $5 double)
-returns double begin return p$2(q, $3, $4, $5, 1, 0); end;
-
-create function sys.q$2(p double, $3 double, $4 double, $5 double, lower integer, log integer)
-returns double external name rmath."q$2";
-
-create function sys.q$2(p double, $3 double, $4 double, $5 double)
-returns double begin return q$2(p, $3, $4, $5, 1, 0); end;
-
-create function sys.d$2(x double, $3 double, $4 double, $5 double, log integer)
-returns double external name rmath."d$2";
-
-create function sys.d$2(x double, $3 double, $4 double, $5 double)
-returns double begin return d$2(x, $3, $4, $5, 0); end;
-
-create function sys.r$2($3 double, $4 double, $5 double)
-returns double external name rmath."r$2";
+FUNCTION6($1 cumulative density function,p$2,double,q,double,$3,double,$4,double,$5,integer,lower,integer,log)
+FUNCTION6($1 quantile function,q$2,double,p,double,$3,double,$4,double,$5,integer,lower,integer,log)
+FUNCTION5($1 probability density function,d$2,double,p,double,$3,double,$4,double,$5,integer,log)
+FUNCTION3($1 random numbers,r$2,double,$3,double,$4,double,$5)
 ')
 
 define(`FUNCTION0',`-- $1
-create function sys.$2()
-returns double external name rmath."$2";
+create function r_$2()
+returns double
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    result->initialize(result, 1);
+    result->data[0] = $2;
+};
 ')
 define(`FUNCTION1',`-- $1
-create function sys.$2($4 $3)
-returns double external name rmath."$2";
+create function r_$2($4 $3)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    result->initialize(result, $4.count);
+    for(size_t i_ = 0; i_ < $4.count; i_++) {
+        if ($4.is_null($4.data[i_])) {
+            result->data[i_] = result->null_value;
+        } else {
+            result->data[i_] = $2($4.data[i_]);
+        }
+    }
+};
 ')
 define(`FUNCTION2',`-- $1
-create function sys.$2($4 $3, $6 $5)
-returns double external name rmath."$2";
+create function r_$2($4 $3, $6 $5)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    result->initialize(result, n_);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_])) {
+            result->data[i_] = result->null_value;
+        } else {
+            result->data[i_] = $2($4.data[i_*n1_],$6.data[i_*n2_]);
+        }
+    }
+};
 ')
 define(`FUNCTION3',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7)
-returns double external name rmath."$2";
+create function r_$2($4 $3, $6 $5, $8 $7)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    result->initialize(result, n);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_])) {
+            result->data[i_] = result->null_value;
+        } else {
+            result->data[i_] = $2($4.data[i_*n1_],$6.data[i_*n2_],$8.data[i_*n3_]);
+        }
+    }
+};
 ')
 define(`FUNCTION4',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9)
-returns double external name rmath."$2";
+create function r_$2($4 $3, $6 $5, $8 $7, $10 $9)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n4_ = $10.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    if ($10.count>n_) n_ = $10.count;
+    result->initialize(result, n_);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_]) || $10.is_null($10.data[i_*n4_])) {
+            result->data[i_] = result->null_value;
+        } else {
+            result->data[i_] = $2($4.data[i_*n1_],$6.data[i_*n2_],$8.data[i_*n3_],$10.data[i_*n4_]);
+        }
+    }
+};
 ')
 define(`FUNCTION5',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
-returns double external name rmath."$2";
+create function r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n4_ = $10.count>1;
+    size_t n5_ = $12.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    if ($10.count>n_) n_ = $10.count;
+    if ($12.count>n_) n_ = $12.count;
+    result->initialize(result, n_);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_]) || $10.is_null($10.data[i_*n4_]) || $12.is_null($12.data[i_*n5_])) {
+            result->data[i_] = result->null_value;
+        } else {
+            result->data[i_] = $2($4.data[i_*n1_],$6.data[i_*n2_],$8.data[i_*n3_],$10.data[i_*n4_],$12.data[i_*n5_]);
+        }
+    }
+};
 ')
 define(`FUNCTION6',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
-returns double external name rmath."$2";
+create function r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n4_ = $10.count>1;
+    size_t n5_ = $12.count>1;
+    size_t n6_ = $14.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    if ($10.count>n_) n_ = $10.count;
+    if ($12.count>n_) n_ = $12.count;
+    if ($14.count>n_) n_ = $14.count;
+    result->initialize(result, n);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_]) || $10.is_null($10.data[i_*n4_]) || $12.is_null($12.data[i_*n5_]) || $14.is_null($14.data[i_*n6_])) {
+            result->data[i_] = result->null_value;
+        } else {
+            result->data[i_] = $2($4.data[i_*n1_],$6.data[i_*n2_],$8.data[i_*n3_],$10.data[i_*n4_],$12.data[i_*n5_],$14.data[i_*n6_]);
+        }
+    }
+};
 ')
 
 divert(`1')
@@ -138,8 +217,8 @@ FUNCTION0(Normal random numbers,norm_rand)
 FUNCTION0(Uniform random numbers,unif_rand)
 FUNCTION0(Exponential random numbers,exp_rand)
 
-create function sys.set_seed(a integer, b integer)
-returns double external name rmath."set_seed";
+-- create function rmath.set_seed(a integer, b integer)
+-- returns double external name rmath."set_seed";
 
 -- void	get_seed(unsigned int *, unsigned int *);
 
@@ -242,32 +321,32 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- rmath_export double R_NegInf;
 -- rmath_export int N01_kind;
 
-FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
-create function sys.poisson_ci(x double, boundary integer)
-returns double begin return poisson_ci(x,boundary,0.95); end;
+-- FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
+-- create function rmath.poisson_ci(x double, boundary integer)
+-- returns double begin return poisson_ci(x,boundary,0.95); end;
 
-create function sys.poisson_cis(x double, conflevel double)
-returns table(lci double, uci double)
-external name rmath."poisson_cis";
+-- create function rmath.poisson_cis(x double, conflevel double)
+-- returns table(lci double, uci double)
+-- external name rmath."poisson_cis";
 
-create function sys.poisson_cis2(x double, conflevel double)
-returns table(lci double, uci double)
-external name rmath."poisson_cis2";
+-- create function rmath.poisson_cis2(x double, conflevel double)
+-- returns table(lci double, uci double)
+-- external name rmath."poisson_cis2";
 
--- deprecated call
-create function sys.poissonci(x double, boundary integer, conflevel double)
-returns double begin return poisson_ci(x,boundary,conflevel); end;
+-- -- deprecated call
+-- create function rmath.poissonci(x double, boundary integer, conflevel double)
+-- returns double begin return poisson_ci(x,boundary,conflevel); end;
 
--- deprecated call
-create function sys.poissonci(x double, boundary integer)
-returns double begin return poisson_ci(x,boundary,0.95); end;
+-- -- deprecated call
+-- create function rmath.poissonci(x double, boundary integer)
+-- returns double begin return poisson_ci(x,boundary,0.95); end;
 
--- alternative: 0=left, 1=right, 2=two-sided
-FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
+-- -- alternative: 0=left, 1=right, 2=two-sided
+-- FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
 
-create function sys.poisson_test(x double, t double, r double)
-returns double begin return poisson_test(x,t,r,2); end;
+-- create function rmath.poisson_test(x double, t double, r double)
+-- returns double begin return poisson_test(x,t,r,2); end;
 
-create function sys.poisson_test(x double, t double)
-returns double begin return poisson_test(x,t,1.0,2); end;
+-- create function rmath.poisson_test(x double, t double)
+-- returns double begin return poisson_test(x,t,1.0,2); end;
 
