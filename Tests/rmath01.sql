@@ -99,8 +99,9 @@ drop function poisson_test3(double,double);
 create function poisson_test3(y double,e double) returns table(lci double, uci double, pvalue double) language r {data.frame(t(mapply(function(yi,ei) {test=poisson.test(yi,ei); c(lci=test$conf.int[1], uci=test$conf.int[2], pvalue=test$p.value)},y,e)))};
 select poisson_test3(10,12).*;
 
+\t clock
 drop table vals;
-create table vals as select cast(value as double) as value, cast(value as double)*1.1 as value2, 1.0 as r, 2 as alt  from generate_series(1.0,10001.0,1.0);
+create table vals as select cast(value as double) as value, cast(value as double)*1.1 as value2, 1.0 as r, 2 as alt, 1 as one, cast(0.95 as double) as conflevel  from generate_series(1.0,10001.0,1.0);
 select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from vals) as t; -- 28ms FASTEST (slightly faster than vectorised R)
 select sum(poisson_ci2(value,1)), sum(poisson_ci2(value,2)) from vals; -- 1.6s
 select sum(lci), sum(uci) from poisson_ci3((select value from vals)); -- 790ms
@@ -111,6 +112,8 @@ select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2; -- 1
 select sum(poisson_test(value,value2)) from vals; -- 5.6s
 select sum(pvalue) from poisson_test3((select value,value2 from vals)); -- 8.8s
 
+explain select sum(poisson_ci(value,1)) from generate_series(1,10);
+explain select sum(poisson_ci(value,one,conflevel)) from vals;
 
 drop table test;
 create table test as select * from poisson_ci4((select value from generate_series(1.0,10000.0,1.0))); -- 1.2s
