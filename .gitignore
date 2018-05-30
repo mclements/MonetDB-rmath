@@ -1,5 +1,5 @@
 lib_rmath.la
-lib_rmath.so
+lib_rmath_??.so
 rmath_ext.o
 *~
 .monetdb
