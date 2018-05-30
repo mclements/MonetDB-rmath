@@ -1,8 +1,8 @@
 lib_rmath.la
-lib_rmath_??.so
+lib_rmath.so
 rmath_ext.o
 *~
 .monetdb
-75_rmath.sql
+??_rmath.sql
 README.html
 temp
