@@ -432,8 +432,8 @@ FUNCTION0(Normal random numbers,norm_rand)
 FUNCTION0(Uniform random numbers,unif_rand)
 FUNCTION0(Exponential random numbers,exp_rand)
 
--- create function sys.set_seed(a integer, b integer)
--- returns double external name sys."set_seed";
+FUNCTION2F(Set random seed,set_seed,integer,seed1,integer,seed2,
+`set_seed(a,b); res=1.0;')
 
 -- void	get_seed(unsigned int *, unsigned int *);
 
