@@ -418,6 +418,25 @@ select myexp();
 SELECT i, myexp() FROM integers;
 
 /*
+I have implemented most of the rmath extension using JIT functions. The JIT formulation is considerably shorter, simpler and more general - where the code can deal with function arguments that are an arbitrary mix of scalars and BATs. 
 
+To use the JIT library:
+
+git clone https://github.com/mclements/MonetDB-rmath.git
+git checkout jit
+make 
+sudo make install
+
+mclient -d testt -s "select r_pnorm(1.96,0,1);"
+
+I found several challenges with the JIT implementation. First, the functions seem to be slower than the base implementation. 
+
+Second, extensions with new C functions will need a header file that is available to MonetDB. A fragile solution is to use the following in the Makefile:
+
+MONETDBINCLUDE = $(patsubst -I%,%,$(firstword $(shell pkg-config --cflags-only-I monetdb5)))
+
+which assumes that the MonetDB include folder is first in CFLAGS, and then copy the extension-specific header to this folder.
+
+Third, as a minor point, I needed to rename the functions (e.g. using r_  as a prefix) -- otherwise the function names would be the same as in Rmath.h. 
 
 */

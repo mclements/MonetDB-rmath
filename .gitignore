@@ -5,3 +5,4 @@ rmath_ext.o
 .monetdb
 75_rmath.sql
 README.html
+temp
