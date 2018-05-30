@@ -106,7 +106,7 @@ select sum(lci), sum(uci) from (select r_poisson_ci(value,1) as lci, r_poisson_c
 select sum(poisson_ci2(value,1)), sum(poisson_ci2(value,2)) from vals; -- 1.6s
 select sum(lci), sum(uci) from poisson_ci3((select value from vals)); -- 790ms
 select sum(lci), sum(uci) from poisson_ci4((select value from vals)); -- 1.1s?? SLOW
-select sum(lci), sum(uci) from poisson_ci5((select value from vals)); -- 40ms FAST
+select sum(lci), sum(uci) from poisson_ci5((select value from vals)); -- 40ms FASTEST
 select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2; -- 1.3s SLOW (lateral)
 --
 select sum(poisson_test(value,value2)) from vals; -- 5.6s
