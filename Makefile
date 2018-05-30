@@ -17,7 +17,7 @@ LDFLAGS += $(shell pkg-config --libs libRmath)
 CFLAGS  += $(shell pkg-config --cflags monetdb5)
 LDFLAGS += $(shell pkg-config --libs monetdb5)
 
-all: lib_rmath.so 74_rmath.sql
+all: lib_rmath.so 75_rmath.sql
 
 lib_rmath.so: rmath_ext.o
 	$(CC) -fPIC -DPIC -o lib_rmath.so -shared rmath_ext.o $(LDFLAGS) -Wl,-soname -Wl,lib_rmath.so
@@ -25,17 +25,17 @@ lib_rmath.so: rmath_ext.o
 rmath_ext.o: rmath_ext.c
 	$(CC) -fPIC -DPIC $(CFLAGS) -c rmath_ext.c
 
-74_rmath.sql: 74_rmath.sql.in
-	${M4} ${M4FLAGS} ${M4SCRIPT} 74_rmath.sql.in > temp
-	${M4} ${M4FLAGS} -DDCFLAGS="${CFLAGS}" -DDLDFLAGS="${LDFLAGS}" changecom1.m4 temp > 74_rmath.sql
+75_rmath.sql: 75_rmath.sql.in
+	${M4} ${M4FLAGS} ${M4SCRIPT} 75_rmath.sql.in > temp
+	${M4} ${M4FLAGS} -DDCFLAGS="${CFLAGS}" -DDLDFLAGS="${LDFLAGS}" changecom1.m4 temp > 75_rmath.sql
 
 clean:
-	rm -f *.o *.so 74_rmath.sql temp
+	rm -f *.o *.so 75_rmath.sql temp
 
-install: lib_rmath.so 74_rmath.sql
+install: lib_rmath.so 75_rmath.sql
 	cp lib_rmath.so $(DESTDIR)$(LIBDIR)/monetdb5
 	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/createdb
-	cp 74_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
+	cp 75_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp rmath_ext.h $(MONETDBINCLUDE)
 
 dist:
