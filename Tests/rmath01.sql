@@ -1,15 +1,15 @@
 -- (async-shell-command "monetdbd start ~/work/mydbfarm")
 -- (sql-monetdb)
 
-SELECT sys.pchisq(20.0, 5.0);
+SELECT sys.r_pchisq(20.0, 5.0);
 
-SELECT sys.pchisq(20.0, NULL);
+SELECT sys.r_pchisq(20.0, NULL);
 
-SELECT sys.pchisq(NULL, 5.0);
+SELECT sys.r_pchisq(NULL, 5.0);
 
-SELECT sys.pchisq(-1, 5.0); -- there is currently no guard against out-of-range inputs
+SELECT sys.r_pchisq(-1, 5.0); -- there is currently no guard against out-of-range inputs
 
-SELECT sys.pchisq(20.0, 1.0);
+SELECT sys.r_pchisq(20.0, 1.0);
 
 CREATE TABLE chi2(a double, b double);
 
@@ -17,19 +17,19 @@ INSERT INTO chi2 VALUES (20.0, 5.0),
        	    	 	(22.0, 4.0),
 			(20.0, 6.0);
 
-SELECT pchisq(a, b) FROM chi2;
+SELECT r_pchisq(a, b) FROM chi2;
 
-SELECT pchisq(a, 6.0) FROM chi2;
+SELECT r_pchisq(a, 6.0) FROM chi2;
 
-SELECT pchisq(19.0, b) FROM chi2;
+SELECT r_pchisq(19.0, b) FROM chi2;
 
 INSERT INTO chi2 VALUES (20.0, NULL);
 
-SELECT pchisq(a, b) FROM chi2;
+SELECT r_pchisq(a, b) FROM chi2;
 
-SELECT pchisq(a, 6.0) FROM chi2;
+SELECT r_pchisq(a, 6.0) FROM chi2;
 
-SELECT pchisq(19.0, b) FROM chi2;
+SELECT r_pchisq(19.0, b) FROM chi2;
 
 DELETE FROM chi2;
 
@@ -38,11 +38,11 @@ INSERT INTO chi2 VALUES (20.0, 5.0),
 			(20.0, 6.0),
                         (NULL, 5.0);
 
-SELECT pchisq(a, b) FROM chi2;
+SELECT r_pchisq(a, b) FROM chi2;
 
-SELECT pchisq(a, 6.0) FROM chi2;
+SELECT r_pchisq(a, 6.0) FROM chi2;
 
-SELECT pchisq(19.0, b) FROM chi2;
+SELECT r_pchisq(19.0, b) FROM chi2;
 
 DELETE FROM chi2;
 
@@ -51,34 +51,34 @@ INSERT INTO chi2 VALUES (20.0, 5.0),
 			(20.0, 6.0),
                         (-1, 5.0);
 
-SELECT pchisq(a, b) FROM chi2;
+SELECT r_pchisq(a, b) FROM chi2;
 
-SELECT pchisq(a, 6.0) FROM chi2;
+SELECT r_pchisq(a, 6.0) FROM chi2;
 
-SELECT pchisq(19.0, b) FROM chi2;
+SELECT r_pchisq(19.0, b) FROM chi2;
 
 DELETE FROM chi2;
 
 drop table chi2;
 create table chi2 as select value/10000.0 as value from sys.generate_series(cast(1 as integer),100000);
-select count(*) from (select pchisq(value,2) from chi2) as t;
-select count(*) from (select pnorm(value,0,1) from chi2) as t;
+select count(*) from (select r_pchisq(value,2) from chi2) as t;
+select count(*) from (select r_pnorm(value,0,1) from chi2) as t;
 drop table chi2;
 
-select set_seed(1,2);
-select runif(0.0,1.0);
-select runif(0.0,1.0);
-select set_seed(1,2);
-select runif(0.0,1.0);
-select runif(0.0,1.0);
+select r_set_seed(1,2);
+select r_runif(0.0,1.0);
+select r_runif(0.0,1.0);
+select r_set_seed(1,2);
+select r_runif(0.0,1.0);
+select r_runif(0.0,1.0);
 
-select rpois(value*0+100) from sys.generate_series(1,10); -- ok
-select value, rpois(100) from sys.generate_series(1,10);  -- repeated
-select rpois(100) from sys.generate_series(1,10);         -- repeated
+select r_rpois(value*0+100) from sys.generate_series(1,10); -- ok
+select value, r_rpois(100) from sys.generate_series(1,10);  -- repeated
+select r_rpois(100) from sys.generate_series(1,10);         -- repeated
 
-select 10 as n, poissonci(10,1) as lower, poissonci(10,2) as upper
+select 10 as n, r_poisson_ci(10,1) as lower, r_poisson_ci(10,2) as upper
 union all
-select 0, poissonci(0,1), poissonci(0,2);
+select 0, r_poisson_ci(0,1), r_poisson_ci(0,2);
 
 -- scalar function using R
 drop function poisson_ci2(double,integer);
@@ -88,7 +88,7 @@ drop function poisson_ci3(double);
 create function poisson_ci3(y double) returns table (lci double, uci double) language r {val = t(sapply(y,function(yi) {test = poisson.test(yi)})); data.frame(lci=val[,1],uci=val[,2])};
 -- table returning function using C code
 drop function poisson_ci4(double);
-create function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select poisson_ci(y,1) as lci, poisson_ci(y,2) as uci); end;
+create function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select r_poisson_ci(y,1) as lci, r_poisson_ci(y,2) as uci); end;
 -- vectorised R code
 drop function poisson_ci5(double);
 create function poisson_ci5(y double) returns table (lci double, uci double) language r {alpha=0.025; data.frame(lci=ifelse(y==0,0,qgamma(alpha,y)), uci=qgamma(1-alpha,y+1))};
@@ -99,9 +99,10 @@ drop function poisson_test3(double,double);
 create function poisson_test3(y double,e double) returns table(lci double, uci double, pvalue double) language r {data.frame(t(mapply(function(yi,ei) {test=poisson.test(yi,ei); c(lci=test$conf.int[1], uci=test$conf.int[2], pvalue=test$p.value)},y,e)))};
 select poisson_test3(10,12).*;
 
+\t clock
 drop table vals;
 create table vals as select cast(value as double) as value, cast(value as double)*1.1 as value2, 1.0 as r, 2 as alt  from generate_series(1.0,10001.0,1.0);
-select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from vals) as t; -- 28ms FASTEST (slightly faster than vectorised R)
+select sum(lci), sum(uci) from (select r_poisson_ci(value,1) as lci, r_poisson_ci(value,2) as uci from vals) as t; -- 28ms FASTEST (slightly faster than vectorised R)
 select sum(poisson_ci2(value,1)), sum(poisson_ci2(value,2)) from vals; -- 1.6s
 select sum(lci), sum(uci) from poisson_ci3((select value from vals)); -- 790ms
 select sum(lci), sum(uci) from poisson_ci4((select value from vals)); -- 1.1s?? SLOW
@@ -126,9 +127,9 @@ select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value 
 
 drop table vals;
 create table vals as select cast(value as double) as generate_series from generate_series(1.0,10.0,1.0);
-explain select poisson_ci(value,1,0.95) as lci, poisson_ci(value,2,0.95) as uci from generate_series(10.0,11.0,1.0);
-explain select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from generate_series(10.0,11.0,1.0);
-explain select poisson_ci(value,1) as lci, poisson_ci(value,2) from (select 10 as value union select 11 as value) as x;
+explain select r_poisson_ci(value,1,0.95) as lci, r_poisson_ci(value,2,0.95) as uci from generate_series(10.0,11.0,1.0);
+explain select r_poisson_ci(value,1) as lci, r_poisson_ci(value,2) as uci from generate_series(10.0,11.0,1.0);
+explain select r_poisson_ci(value,1) as lci, r_poisson_ci(value,2) from (select 10 as value union select 11 as value) as x;
 explain select *  from vals, lateral poisson_ci4(vals.value) as t2;
 
 
@@ -416,3 +417,7 @@ INSERT INTO integers VALUES (1), (2), (NULL), (3), (4);
 select myexp();
 SELECT i, myexp() FROM integers;
 
+/*
+
+
+*/
