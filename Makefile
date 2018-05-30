@@ -17,10 +17,10 @@ LDFLAGS += $(shell pkg-config --libs libRmath)
 CFLAGS  += $(shell pkg-config --cflags monetdb5)
 LDFLAGS += $(shell pkg-config --libs monetdb5)
 
-all: lib_rmath.so 75_rmath.sql
+all: lib_rmath_75.so 75_rmath.sql
 
-lib_rmath.so: rmath_ext.o
-	$(CC) -fPIC -DPIC -o lib_rmath.so -shared rmath_ext.o $(LDFLAGS) -Wl,-soname -Wl,lib_rmath.so
+lib_rmath_75.so: rmath_ext.o
+	$(CC) -fPIC -DPIC -o lib_rmath_75.so -shared rmath_ext.o $(LDFLAGS) -Wl,-soname -Wl,lib_rmath_75.so
 
 rmath_ext.o: rmath_ext.c
 	$(CC) -fPIC -DPIC $(CFLAGS) -c rmath_ext.c
@@ -32,8 +32,8 @@ rmath_ext.o: rmath_ext.c
 clean:
 	rm -f *.o *.so 75_rmath.sql temp
 
-install: lib_rmath.so 75_rmath.sql
-	cp lib_rmath.so $(DESTDIR)$(LIBDIR)/monetdb5
+install: lib_rmath_75.so 75_rmath.sql
+	cp lib_rmath_75.so $(DESTDIR)$(LIBDIR)/monetdb5
 	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp 75_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp rmath_ext.h $(MONETDBINCLUDE)
