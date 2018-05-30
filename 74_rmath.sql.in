@@ -42,8 +42,7 @@ define(`FUNCTION0',`-- $1
 create function sys.r_$2()
 returns double
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     result->initialize(result, 1);
@@ -54,8 +53,7 @@ define(`FUNCTION1',`-- $1
 create function sys.r_$2($4 $3)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     result->initialize(result, $4.count);
@@ -72,8 +70,7 @@ define(`FUNCTION2',`-- $1
 create function sys.r_$2($4 $3, $6 $5)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -93,8 +90,7 @@ define(`FUNCTION3',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -116,8 +112,7 @@ define(`FUNCTION4',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -141,8 +136,7 @@ define(`FUNCTION5',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -168,8 +162,7 @@ define(`FUNCTION6',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -194,41 +187,11 @@ language c {
 };
 ')
 
-# define(`FUNCTION3F',`-- $1
-# create function r_$2($4 $3, $6 $5, $8 $7)
-# returns double 
-# language c {
-# #define MATHLIB_STANDALONE
-# #include "Rmath.h"
-# #pragma CFLAGS DCFLAGS
-# #pragma LDFLAGS DLDFLAGS
-#     size_t n1_ = $4.count>1;
-#     size_t n2_ = $6.count>1;
-#     size_t n3_ = $8.count>1;
-#     size_t n_ = $4.count>$6.count ? $4.count : $6.count;
-#     if ($8.count>n_) n_ = $8.count;
-#     result->initialize(result, n_);
-#     for(size_t i_ = 0; i_ < n_; i_++) {
-#         if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_])) {
-#             result->data[i_] = result->null_value;
-#         } else {
-# 	    double res;
-# 	    define(`FUN3',$9)dnl
-# 	    FUN3($4.data[i_*n1_],
-# 		$6.data[i_*n2_],
-# 	    	$8.data[i_*n3_])
-#             result->data[i_] = res;
-#         }
-#     }
-# };
-# ')
-
 define(`FUNCTION1F',`-- $1
 create function sys.r_$2($4 $3)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     result->initialize(result, $4.count);
@@ -248,8 +211,7 @@ define(`FUNCTION2F',`-- $1
 create function sys.r_$2($4 $3, $6 $5)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -273,8 +235,7 @@ define(`FUNCTION3F',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -301,8 +262,7 @@ define(`FUNCTION4F',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -332,8 +292,7 @@ define(`FUNCTION5F',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -366,8 +325,7 @@ define(`FUNCTION6F',`-- $1
 create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
 returns double 
 language c {
-#define MATHLIB_STANDALONE
-#include "Rmath.h"
+#include "rmath_ext.h"
 #pragma CFLAGS DCFLAGS
 #pragma LDFLAGS DLDFLAGS
     size_t n1_ = $4.count>1;
@@ -544,27 +502,16 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- returns table(lci double, uci double)
 -- external name sys."poisson_cis2";
 
--- -- alternative: 0=left, 1=right, 2=two-sided
--- # FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
+-- alternative: 0=left, 1=right, 2=two-sided
+FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative)
 
--- create function sys.poisson_test(x double, t double, r double)
--- returns double begin return poisson_test(x,t,r,2); end;
+create function sys.poisson_test(x double, t double, r double)
+returns double begin return sys.r_poisson_test(x,t,r,2); end;
 
--- create function sys.poisson_test(x double, t double)
--- returns double begin return poisson_test(x,t,1.0,2); end;
+create function sys.poisson_test(x double, t double)
+returns double begin return sys.r_poisson_test(x,t,1.0,2); end;
 
-# FUNCTION3F(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel,
-# `double alpha = (1.0-$3)/2.0;
-#   if ($1==0 && $2==1) res=0.0;
-#   else if ($2==1) res=qgamma(alpha, $1, 1.0, 1, 0);
-# else res=qgamma(1.0-alpha, $1 + 1,1.0,1,0);')
-
-# FUNCTION3F assumes a result named res that is a double, with variables a, b and c (which are substituted by m4)
-FUNCTION3F(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel,
-`double alpha = (1.0-c)/2.0;
-  if (a==0 && b==1) res=0.0;
-  else if (b==1) res=qgamma(alpha, a, 1.0, 1, 0);
-else res=qgamma(1.0-alpha, a + 1,1.0,1,0);')
+FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
 
 create function sys.r_poisson_ci(x double, boundary integer)
 returns double begin return sys.r_poisson_ci(x,boundary,0.95); end;

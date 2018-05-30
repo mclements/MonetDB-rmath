@@ -6,23 +6,37 @@ M4       = m4
 M4FLAGS  =
 M4SCRIPT =
 
+# NOTE: ASSUMES THAT THE MONETDB INCLUDE FOLDER IS THE FIRST IN CFLAGS
+MONETDBINCLUDE = $(patsubst -I%,%,$(firstword $(shell pkg-config --cflags-only-I monetdb5)))
+
 LIBDIR   = $(shell pkg-config --variable=libdir monetdb5)
 # CFLAGS  += -g -Wall
 CFLAGS  += $(shell pkg-config --cflags libRmath)
 LDFLAGS += $(shell pkg-config --libs libRmath)
 
-all: 74_rmath.sql
+CFLAGS  += $(shell pkg-config --cflags monetdb5)
+LDFLAGS += $(shell pkg-config --libs monetdb5)
+
+all: lib_rmath.so 74_rmath.sql
+
+lib_rmath.so: rmath_ext.o
+	$(CC) -fPIC -DPIC -o lib_rmath.so -shared rmath_ext.o $(LDFLAGS) -Wl,-soname -Wl,lib_rmath.so
+
+rmath_ext.o: rmath_ext.c
+	$(CC) -fPIC -DPIC $(CFLAGS) -c rmath_ext.c
 
 74_rmath.sql: 74_rmath.sql.in
 	${M4} ${M4FLAGS} ${M4SCRIPT} 74_rmath.sql.in > temp
 	${M4} ${M4FLAGS} -DDCFLAGS="${CFLAGS}" -DDLDFLAGS="${LDFLAGS}" changecom1.m4 temp > 74_rmath.sql
 
 clean:
-	rm -f 74_rmath.sql
+	rm -f *.o *.so 74_rmath.sql temp
 
-install: 74_rmath.sql
+install: lib_rmath.so 74_rmath.sql
+	cp lib_rmath.so $(DESTDIR)$(LIBDIR)/monetdb5
 	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp 74_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
+	cp rmath_ext.h $(MONETDBINCLUDE)
 
 dist:
 	tar -c -j -f $(name)-$(version).tar.bz2 --transform "s,^,$(name)-$(version)/," `hg files -X .hgtags`
