@@ -187,6 +187,8 @@ language c {
 };
 ')
 
+# anonymous functions using a,b,c,... as variables that are substituted, with a double variable res
+
 define(`FUNCTION1F',`-- $1
 create function sys.r_$2($4 $3)
 returns double 
@@ -505,10 +507,10 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- alternative: 0=left, 1=right, 2=two-sided
 FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative)
 
-create function sys.poisson_test(x double, t double, r double)
+create function sys.r_poisson_test(x double, t double, r double)
 returns double begin return sys.r_poisson_test(x,t,r,2); end;
 
-create function sys.poisson_test(x double, t double)
+create function sys.r_poisson_test(x double, t double)
 returns double begin return sys.r_poisson_test(x,t,1.0,2); end;
 
 FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
