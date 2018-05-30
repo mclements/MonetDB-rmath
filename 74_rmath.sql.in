@@ -39,7 +39,7 @@ create function r_d$2(x double, $3 double, $4 double, $5 double) returns double 
 ')
 
 define(`FUNCTION0',`-- $1
-create function r_$2()
+create function sys.r_$2()
 returns double
 language c {
 #define MATHLIB_STANDALONE
@@ -51,7 +51,7 @@ language c {
 };
 ')
 define(`FUNCTION1',`-- $1
-create function r_$2($4 $3)
+create function sys.r_$2($4 $3)
 returns double 
 language c {
 #define MATHLIB_STANDALONE
@@ -69,7 +69,7 @@ language c {
 };
 ')
 define(`FUNCTION2',`-- $1
-create function r_$2($4 $3, $6 $5)
+create function sys.r_$2($4 $3, $6 $5)
 returns double 
 language c {
 #define MATHLIB_STANDALONE
@@ -90,7 +90,7 @@ language c {
 };
 ')
 define(`FUNCTION3',`-- $1
-create function r_$2($4 $3, $6 $5, $8 $7)
+create function sys.r_$2($4 $3, $6 $5, $8 $7)
 returns double 
 language c {
 #define MATHLIB_STANDALONE
@@ -102,7 +102,7 @@ language c {
     size_t n3_ = $8.count>1;
     size_t n_ = $4.count>$6.count ? $4.count : $6.count;
     if ($8.count>n_) n_ = $8.count;
-    result->initialize(result, n);
+    result->initialize(result, n_);
     for(size_t i_ = 0; i_ < n_; i_++) {
         if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_])) {
             result->data[i_] = result->null_value;
@@ -113,7 +113,7 @@ language c {
 };
 ')
 define(`FUNCTION4',`-- $1
-create function r_$2($4 $3, $6 $5, $8 $7, $10 $9)
+create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
 returns double 
 language c {
 #define MATHLIB_STANDALONE
@@ -138,7 +138,7 @@ language c {
 };
 ')
 define(`FUNCTION5',`-- $1
-create function r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
+create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
 returns double 
 language c {
 #define MATHLIB_STANDALONE
@@ -165,7 +165,7 @@ language c {
 };
 ')
 define(`FUNCTION6',`-- $1
-create function r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
+create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
 returns double 
 language c {
 #define MATHLIB_STANDALONE
@@ -183,7 +183,7 @@ language c {
     if ($10.count>n_) n_ = $10.count;
     if ($12.count>n_) n_ = $12.count;
     if ($14.count>n_) n_ = $14.count;
-    result->initialize(result, n);
+    result->initialize(result, n_);
     for(size_t i_ = 0; i_ < n_; i_++) {
         if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_]) || $10.is_null($10.data[i_*n4_]) || $12.is_null($12.data[i_*n5_]) || $14.is_null($14.data[i_*n6_])) {
             result->data[i_] = result->null_value;
@@ -194,8 +194,83 @@ language c {
 };
 ')
 
+# define(`FUNCTION3F',`-- $1
+# create function r_$2($4 $3, $6 $5, $8 $7)
+# returns double 
+# language c {
+# #define MATHLIB_STANDALONE
+# #include "Rmath.h"
+# #pragma CFLAGS DCFLAGS
+# #pragma LDFLAGS DLDFLAGS
+#     size_t n1_ = $4.count>1;
+#     size_t n2_ = $6.count>1;
+#     size_t n3_ = $8.count>1;
+#     size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+#     if ($8.count>n_) n_ = $8.count;
+#     result->initialize(result, n_);
+#     for(size_t i_ = 0; i_ < n_; i_++) {
+#         if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_])) {
+#             result->data[i_] = result->null_value;
+#         } else {
+# 	    double res;
+# 	    define(`FUN3',$9)dnl
+# 	    FUN3($4.data[i_*n1_],
+# 		$6.data[i_*n2_],
+# 	    	$8.data[i_*n3_])
+#             result->data[i_] = res;
+#         }
+#     }
+# };
+# ')
+
+define(`FUNCTION1F',`-- $1
+create function sys.r_$2($4 $3)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    result->initialize(result, $4.count);
+    for(size_t i_ = 0; i_ < $4.count; i_++) {
+        if ($4.is_null($4.data[i_])) {
+            result->data[i_] = result->null_value;
+        } else {
+	    double res;
+	    define(`a',$4.data[i_*n1_])dnl
+	    $5
+            result->data[i_] = res;
+        }
+    }
+};
+')
+define(`FUNCTION2F',`-- $1
+create function sys.r_$2($4 $3, $6 $5)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    result->initialize(result, n_);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_])) {
+            result->data[i_] = result->null_value;
+        } else {
+	    double res;
+	    define(`a',$4.data[i_*n1_])dnl
+	    define(`b',$6.data[i_*n2_])dnl
+	    $7
+            result->data[i_] = res;
+        }
+    }
+};
+')
 define(`FUNCTION3F',`-- $1
-create function r_$2($4 $3, $6 $5, $8 $7)
+create function sys.r_$2($4 $3, $6 $5, $8 $7)
 returns double 
 language c {
 #define MATHLIB_STANDALONE
@@ -207,21 +282,123 @@ language c {
     size_t n3_ = $8.count>1;
     size_t n_ = $4.count>$6.count ? $4.count : $6.count;
     if ($8.count>n_) n_ = $8.count;
-    result->initialize(result, n);
-    double $9, $10, $11;
+    result->initialize(result, n_);
     for(size_t i_ = 0; i_ < n_; i_++) {
         if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_])) {
             result->data[i_] = result->null_value;
         } else {
-	    $9 = $4.data[i_*n1_];
-	    $10 = $6.data[i_*n2_];
-	    $11 = $8.data[i_*n3_]
-            result->data[i_] = $12;
+	    double res;
+	    define(`a',$4.data[i_*n1_])dnl
+	    define(`b',$6.data[i_*n2_])dnl
+	    define(`c',$8.data[i_*n3_])dnl
+	    $9
+            result->data[i_] = res;
         }
     }
 };
 ')
-
+define(`FUNCTION4F',`-- $1
+create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n4_ = $10.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    if ($10.count>n_) n_ = $10.count;
+    result->initialize(result, n_);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_]) || $10.is_null($10.data[i_*n4_])) {
+            result->data[i_] = result->null_value;
+        } else {
+	    double res;
+	    define(`a',$4.data[i_*n1_])dnl
+	    define(`b',$6.data[i_*n2_])dnl
+	    define(`c',$8.data[i_*n3_])dnl
+	    define(`d',$10.data[i_*n4_])dnl
+	    $11
+            result->data[i_] = res;
+        }
+    }
+};
+')
+define(`FUNCTION5F',`-- $1
+create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n4_ = $10.count>1;
+    size_t n5_ = $12.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    if ($10.count>n_) n_ = $10.count;
+    if ($12.count>n_) n_ = $12.count;
+    result->initialize(result, n_);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_]) || $10.is_null($10.data[i_*n4_]) || $12.is_null($12.data[i_*n5_])) {
+            result->data[i_] = result->null_value;
+        } else {
+	    double res;
+	    define(`a',$4.data[i_*n1_])dnl
+	    define(`b',$6.data[i_*n2_])dnl
+	    define(`c',$8.data[i_*n3_])dnl
+	    define(`d',$10.data[i_*n4_])dnl
+	    define(`e',$12.data[i_*n5_])dnl
+	    $13
+            result->data[i_] = res;
+        }
+    }
+};
+')
+define(`FUNCTION6F',`-- $1
+create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
+returns double 
+language c {
+#define MATHLIB_STANDALONE
+#include "Rmath.h"
+#pragma CFLAGS DCFLAGS
+#pragma LDFLAGS DLDFLAGS
+    size_t n1_ = $4.count>1;
+    size_t n2_ = $6.count>1;
+    size_t n3_ = $8.count>1;
+    size_t n4_ = $10.count>1;
+    size_t n5_ = $12.count>1;
+    size_t n6_ = $14.count>1;
+    size_t n_ = $4.count>$6.count ? $4.count : $6.count;
+    if ($8.count>n_) n_ = $8.count;
+    if ($10.count>n_) n_ = $10.count;
+    if ($12.count>n_) n_ = $12.count;
+    if ($14.count>n_) n_ = $14.count;
+    result->initialize(result, n_);
+    for(size_t i_ = 0; i_ < n_; i_++) {
+        if ($4.is_null($4.data[i_*n1_]) || $6.is_null($6.data[i_*n2_]) || $8.is_null($8.data[i_*n3_]) || $10.is_null($10.data[i_*n4_]) || $12.is_null($12.data[i_*n5_]) || $14.is_null($14.data[i_*n6_])) {
+            result->data[i_] = result->null_value;
+        } else {
+	    double res;
+	    define(`a',$4.data[i_*n1_])dnl
+	    define(`b',$6.data[i_*n2_])dnl
+	    define(`c',$8.data[i_*n3_])dnl
+	    define(`d',$10.data[i_*n4_])dnl
+	    define(`e',$12.data[i_*n5_])dnl
+	    define(`f',$14.data[i_*n6_])dnl
+	    $15
+            result->data[i_] = res;
+        }
+    }
+};
+')
 
 divert(`1')
 
@@ -255,8 +432,8 @@ FUNCTION0(Normal random numbers,norm_rand)
 FUNCTION0(Uniform random numbers,unif_rand)
 FUNCTION0(Exponential random numbers,exp_rand)
 
--- create function rmath.set_seed(a integer, b integer)
--- returns double external name rmath."set_seed";
+-- create function sys.set_seed(a integer, b integer)
+-- returns double external name sys."set_seed";
 
 -- void	get_seed(unsigned int *, unsigned int *);
 
@@ -359,32 +536,43 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- rmath_export double R_NegInf;
 -- rmath_export int N01_kind;
 
--- # FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
--- create function rmath.poisson_ci(x double, boundary integer)
--- returns double begin return poisson_ci(x,boundary,0.95); end;
-
--- create function rmath.poisson_cis(x double, conflevel double)
+-- create function sys.poisson_cis(x double, conflevel double)
 -- returns table(lci double, uci double)
--- external name rmath."poisson_cis";
+-- external name sys."poisson_cis";
 
--- create function rmath.poisson_cis2(x double, conflevel double)
+-- create function sys.poisson_cis2(x double, conflevel double)
 -- returns table(lci double, uci double)
--- external name rmath."poisson_cis2";
-
--- -- deprecated call
--- create function rmath.poissonci(x double, boundary integer, conflevel double)
--- returns double begin return poisson_ci(x,boundary,conflevel); end;
-
--- -- deprecated call
--- create function rmath.poissonci(x double, boundary integer)
--- returns double begin return poisson_ci(x,boundary,0.95); end;
+-- external name sys."poisson_cis2";
 
 -- -- alternative: 0=left, 1=right, 2=two-sided
 -- # FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
 
--- create function rmath.poisson_test(x double, t double, r double)
+-- create function sys.poisson_test(x double, t double, r double)
 -- returns double begin return poisson_test(x,t,r,2); end;
 
--- create function rmath.poisson_test(x double, t double)
+-- create function sys.poisson_test(x double, t double)
 -- returns double begin return poisson_test(x,t,1.0,2); end;
 
+# FUNCTION3F(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel,
+# `double alpha = (1.0-$3)/2.0;
+#   if ($1==0 && $2==1) res=0.0;
+#   else if ($2==1) res=qgamma(alpha, $1, 1.0, 1, 0);
+# else res=qgamma(1.0-alpha, $1 + 1,1.0,1,0);')
+
+FUNCTION3F(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel,
+`double alpha = (1.0-c)/2.0;
+  if (a==0 && b==1) res=0.0;
+  else if (b==1) res=qgamma(alpha, a, 1.0, 1, 0);
+else res=qgamma(1.0-alpha, a + 1,1.0,1,0);')
+
+create function sys.r_poisson_ci(x double, boundary integer)
+returns double begin return sys.r_poisson_ci(x,boundary,0.95); end;
+
+-- deprecated call
+create function sys.poissonci(x double, boundary integer, conflevel double)
+returns double begin return sys.r_poisson_ci(x,boundary,conflevel); end;
+
+-- deprecated call
+create function sys.poissonci(x double, boundary integer)
+returns double begin return sys.r_poisson_ci(x,boundary,0.95); end;
+	   
