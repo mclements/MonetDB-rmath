@@ -70,7 +70,7 @@ command batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:bat[:$7]):bat[:dbl]
   address bat_rmath_bats_$2
   comment "$1";
 function batrmath.$2($4:bat[:$3],$6:bat[:$5],$8:$7):bat[:dbl];
-  third:bat[:7] := algebra.project($4,$8:$7);
+  third:bat[:$7] := algebra.project($4,$8:$7);
   out:bat[:dbl] := batrmath.$2($4,$6,third);
   return out;
 end;
