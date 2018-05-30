@@ -32,8 +32,8 @@ clean:
 install: lib_rmath.so rmath.mal 74_rmath.sql
 	mkdir -p $(DESTDIR)$(LIBDIR)/monetdb5/autoload $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp rmath.mal lib_rmath.so $(DESTDIR)$(LIBDIR)/monetdb5
-	cp ??_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
-	cp ??_rmath.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
+	cp 74_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
+	cp 74_rmath.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
 
 dist:
 	tar -c -j -f $(name)-$(version).tar.bz2 --transform "s,^,$(name)-$(version)/," `hg files -X .hgtags`
