@@ -7,6 +7,7 @@ CC       = cc
 M4       = m4
 M4FLAGS  =
 M4SCRIPT =
+DBFARM   = ~/work/mydbfarm
 
 LIBDIR   = $(shell pkg-config --variable=libdir monetdb5)
 CFLAGS  += -g -Wall
@@ -20,7 +21,7 @@ all: lib_rmath.so
 .in:
 	${M4} ${M4FLAGS} ${M4SCRIPT} $< > $*
 
-lib_rmath.so: rmath.o
+lib_rmath.so: rmath.o rmath.mal 74_rmath.sql
 	$(CC) -fPIC -DPIC -o lib_rmath.so -shared rmath.o $(LDFLAGS) -Wl,-soname -Wl,lib_rmath.so
 
 rmath.o: rmath.c
@@ -35,28 +36,36 @@ install: lib_rmath.so rmath.mal 74_rmath.sql
 	cp 74_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp 74_rmath.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
 
+remove:
+	rm $(DESTDIR)$(LIBDIR)/monetdb5/rmath.mal || true
+	rm $(DESTDIR)$(LIBDIR)/monetdb5/lib_rmath.so || true
+	rm $(DESTDIR)$(LIBDIR)/monetdb5/createdb/74_rmath.sql || true
+	rm $(DESTDIR)$(LIBDIR)/monetdb5/autoload/74_rmath.mal || true
+
+redo: clean lib_rmath.so install test
+
 dist:
 	tar -c -j -f $(name)-$(version).tar.bz2 --transform "s,^,$(name)-$(version)/," `hg files -X .hgtags`
 
 sql:
-	monetdbd start ~/work/mydbfarm || true
+	monetdbd start $(DBFARM) || true
 	mclient -d testt
 
 mal:
-	monetdbd start ~/work/mydbfarm || true
+	monetdbd start $(DBFARM) || true
 	mclient -l mal testt
 
 start:
-	monetdbd start ~/work/mydbfarm || true
+	monetdbd start $(DBFARM) || true
 
 stop:
-	monetdbd stop ~/work/mydbfarm || true
+	monetdbd stop $(DBFARM) || true
 
 test:
-	monetdbd start ~/work/mydbfarm || true
+	monetdbd start $(DBFARM) || true
 	monetdb destroy -f testt || true
 	monetdb create testt
 	monetdb release testt
 	monetdb set embedr=yes testt
 	monetdb set embedc=yes testt
-	mclient -d testt -s "select pnorm(1.96, 0, 1); create table temp (x double); insert into temp values (0.1); insert into temp values (0.2); select qgamma(x,2.0,1.0,1,0), qgamma(x*2,2.0,1.0,1,0) from temp; select poisson_ci(10,1), poisson_ci(10,2); select poisson_ci(value,1), poisson_ci(value,2) from (select 10 as value union select 11 as value) as t; select poisson_test(value,value*2,1.0,2) as pvalue from generate_series(cast(0.0 as double),5.0,1.0);"
+	mclient -d testt -s "select pnorm(1.96, 0, 1); create table temp (x double); insert into temp values (0.1); insert into temp values (0.2); select qgamma(x,2.0,1.0,1,0), qgamma(x*2,2.0,1.0,1,0) from temp; select poisson_ci(10,1), poisson_ci(10,2); select poisson_ci(value,1), poisson_ci(value,2) from (select 10 as value union select 11 as value) as t; select poisson_test(value,value*2,1.0,2) as pvalue from generate_series(cast(0.0 as double),5.0,1.0);" || echo Warning: check that MonetDB-gsl is not installed.
