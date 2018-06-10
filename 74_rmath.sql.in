@@ -242,32 +242,32 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- rmath_export double R_NegInf;
 -- rmath_export int N01_kind;
 
-FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
-create function sys.poisson_ci(x double, boundary integer)
-returns double begin return sys.poisson_ci(x,boundary,0.95); end;
+FUNCTION3(Exact Poisson confidence interval,rmath_poisson_ci,double,x,integer,boundary,double,conflevel)
+create function sys.rmath_poisson_ci(x double, boundary integer)
+returns double begin return sys.rmath_poisson_ci(x,boundary,0.95); end;
 
-create function sys.poisson_cis(x double, conflevel double)
+create function sys.rmath_poisson_cis(x double, conflevel double)
 returns table(lci double, uci double)
-external name rmath."poisson_cis";
+external name rmath."rmath_poisson_cis";
 
-create function sys.poisson_cis2(x double, conflevel double)
+create function sys.rmath_poisson_cis2(x double, conflevel double)
 returns table(lci double, uci double)
-external name rmath."poisson_cis2";
+external name rmath."rmath_poisson_cis2";
 
 -- deprecated call
 create function sys.poissonci(x double, boundary integer, conflevel double)
-returns double begin return sys.poisson_ci(x,boundary,conflevel); end;
+returns double begin return sys.rmath_poisson_ci(x,boundary,conflevel); end;
 
 -- deprecated call
 create function sys.poissonci(x double, boundary integer)
-returns double begin return sys.poisson_ci(x,boundary,0.95); end;
+returns double begin return sys.rmath_poisson_ci(x,boundary,0.95); end;
 
 -- alternative: 0=left, 1=right, 2=two-sided
-FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative);
+FUNCTION4(Poisson test,rmath_poisson_test,double,x,double,t,double,r,int,alternative);
 
-create function sys.poisson_test(x double, t double, r double)
-returns double begin return sys.poisson_test(x,t,r,2); end;
+create function sys.rmath_poisson_test(x double, t double, r double)
+returns double begin return sys.rmath_poisson_test(x,t,r,2); end;
 
-create function sys.poisson_test(x double, t double)
-returns double begin return sys.poisson_test(x,t,1.0,2); end;
+create function sys.rmath_poisson_test(x double, t double)
+returns double begin return sys.rmath_poisson_test(x,t,1.0,2); end;
 

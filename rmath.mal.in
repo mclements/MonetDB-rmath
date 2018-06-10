@@ -363,27 +363,27 @@ FUNCTION1(ftrunc,ftrunc,dbl,x)
 # rmath_export dbl R_NegInf;
 # rmath_export int N01_kind;
 
-FUNCTION3(Exact Poisson confidence interval,poisson_ci,dbl,x,int,boundary,dbl,conflevel)
-FUNCTION4(Poisson test,poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
+FUNCTION3(Exact Poisson confidence interval,rmath_poisson_ci,dbl,x,int,boundary,dbl,conflevel)
+FUNCTION4(Poisson test,rmath_poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
 
-command rmath.poisson_cis(x:dbl,conflevel:dbl)(:bat[:dbl],:bat[:dbl])
+command rmath.rmath_poisson_cis(x:dbl,conflevel:dbl)(:bat[:dbl],:bat[:dbl])
   address rmath_scalar_bat_poisson_cis
   comment "Exact Poisson confidence intervals";
-function batrmath.poisson_cis(x:bat[:dbl],conflevel:bat[:dbl])(:bat[:dbl],:bat[:dbl]);
+function batrmath.rmath_poisson_cis(x:bat[:dbl],conflevel:bat[:dbl])(:bat[:dbl],:bat[:dbl]);
   one:bat[:int] := algebra.project(x,1:int);
   two:bat[:int] := algebra.project(x,2:int);
-  lci:bat[:dbl] := batrmath.poisson_ci(x,one,conflevel);
-  uci:bat[:dbl] := batrmath.poisson_ci(x,two,conflevel);
+  lci:bat[:dbl] := batrmath.rmath_poisson_ci(x,one,conflevel);
+  uci:bat[:dbl] := batrmath.rmath_poisson_ci(x,two,conflevel);
   return (lci,uci);
 end;
-function batrmath.poisson_cis(x:bat[:dbl],conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
+function batrmath.rmath_poisson_cis(x:bat[:dbl],conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
   cl:bat[:dbl] := algebra.project(x,conflevel);
-  return (lci,uci) := batrmath.poisson_cis(x,cl);
+  return (lci,uci) := batrmath.rmath_poisson_cis(x,cl);
 end;
 
-function rmath.poisson_cis2(x:dbl,conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
-  lcii:dbl := rmath.poisson_ci(x,1:int,conflevel);
-  ucii:dbl := rmath.poisson_ci(x,2:int,conflevel);
+function rmath.rmath_poisson_cis2(x:dbl,conflevel:dbl)(:bat[:dbl],:bat[:dbl]);
+  lcii:dbl := rmath.rmath_poisson_ci(x,1:int,conflevel);
+  ucii:dbl := rmath.rmath_poisson_ci(x,2:int,conflevel);
   lci:bat[:dbl] := bat.single(lcii);
   uci:bat[:dbl] := bat.single(ucii);
   return (lci,uci);

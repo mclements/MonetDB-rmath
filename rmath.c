@@ -953,15 +953,15 @@ FUNCTION1(ftrunc,dbl,x)
 // rmath_export dbl R_NegInf;
 // rmath_export int N01_kind;
 
-double poisson_ci(double x, int boundary, double conflevel) {
+double rmath_poisson_ci(double x, int boundary, double conflevel) {
   double alpha = (1.0-conflevel)/2.0;
   if (x==0 && boundary==1) return 0.0;
   else if (boundary==1) return qgamma(alpha, x, 1.0, 1, 0);
-  else return qgamma(1.0-alpha,x + 1,1.0,1,0);
+  else return qgamma(alpha,x + 1,1.0,0,0);
 }
-FUNCTION3(poisson_ci,dbl,x,int,boundary,dbl,conflevel)
+FUNCTION3(rmath_poisson_ci,dbl,x,int,boundary,dbl,conflevel)
 
-double poisson_test(double x, double t, double r, int alternative) {
+double rmath_poisson_test(double x, double t, double r, int alternative) {
   int Lower=0, Upper=1; // TwoSided=2;
   double m = r*t;
   if (alternative == Lower) return ppois(x,m,1,0);
@@ -985,7 +985,7 @@ double poisson_test(double x, double t, double r, int alternative) {
     }
   }
 }
-FUNCTION4(poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
+FUNCTION4(rmath_poisson_test,dbl,x,dbl,t,dbl,r,int,alternative)
 
 str
 rmath_scalar_bat_poisson_cis(bat *ret, bat *ret2, const dbl *x, const dbl *conflevel)
@@ -997,8 +997,8 @@ rmath_scalar_bat_poisson_cis(bat *ret, bat *ret2, const dbl *x, const dbl *confl
 		if (b_) BBPunfix(b_->batCacheid);
 		throw(MAL, "rmath.poisson_cis", SQLSTATE(HY001) MAL_MALLOC_FAIL);
 	}
-	double lci = poisson_ci(*x, 1, *conflevel);
-	double uci = poisson_ci(*x, 2, *conflevel);
+	double lci = rmath_poisson_ci(*x, 1, *conflevel);
+	double uci = rmath_poisson_ci(*x, 2, *conflevel);
 	if (BUNappend(a_, &lci, FALSE) != GDK_SUCCEED ||
 		BUNappend(b_, &uci, FALSE) != GDK_SUCCEED)
 		goto bailout;
