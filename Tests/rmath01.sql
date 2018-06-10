@@ -234,6 +234,7 @@ select * from test, lateral cis(test.value, cast(1.0 as double)) as t2;
 select cis(2,1).*; -- ok
 select cis(2,1).* from test; -- Error: no such operator 'cis'
 select cis(value,1).* from test; -- Error: identifier 'value' unknown
+select (cis(value,1)).* from test; -- Error: identifier 'value' unknown
 -- lateral is not "vectorised" -- there would be a loop even if a BAT function were available
 -- How to better join results? (Email sent 2018-05-25)
 
