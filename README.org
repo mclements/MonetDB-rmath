@@ -7,7 +7,7 @@
 #+HTML_HEAD: <script type="text/javascript" src="http://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
 #+HTML_HEAD: <style type="text/css">.abstract {max-width: 30em; margin-left: auto; margin-right: auto;}</style>
 
-#+OPTIONS: H:3 num:nil toc:nil html-postamble:nil
+#+OPTIONS: H:3 num:nil html-postamble:nil
 
 #+title: MonetDB-rmath: MonetDB extension to use the Rmath library.
 
@@ -16,8 +16,11 @@
 (shell-command "monetdbd start ~/work/mydbfarm || true")
 #+END_SRC
 
+* Introduction
 
 An early version for MonetDB-rmath is now available. It includes approximately 90% of the functions in [[http://docs.rexamine.com/R-devel/Rmath_8h_source.html][Rmath.h]], including [rpdq] (norm|unif|gamma|beta|lnorm|chisq|nchisq|f|t|binom|cauchy|exp|geom|hyper|nbinom|pois|weibull|logis|wilcox|signrank) and another 65 functions. The current implementation uses [[https://www.gnu.org/software/m4/m4.html][m4]] for code generation and requires the r-mathlib package under Debian.
+
+* Quick installation
 
 One can clone the GitHub repository and install using:
 #+BEGIN_SRC bash :eval no
@@ -26,6 +29,8 @@ cd MonetDB-rmath
 make
 sudo make install
 #+END_SRC
+
+* Some examples
 
 You will then need to use a fresh database. An example script is:
 #+BEGIN_SRC sql :engine monetdb :cmdline "-d testt -e" :results both org :exports results
@@ -61,23 +66,23 @@ select rpois(value*0+100) from sys.generate_series(1,10); -- ok
 +--------------------------+
 | L5                       |
 +==========================+
-|                      103 |
-|                      100 |
-|                       92 |
+|                       87 |
+|                       90 |
+|                       96 |
+|                      117 |
+|                       87 |
 |                       99 |
-|                      102 |
-|                      101 |
-|                      106 |
-|                      103 |
-|                       99 |
+|                       95 |
+|                       86 |
+|                      116 |
 +--------------------------+
 9 tuples
 select rpois(100) from sys.generate_series(1,3);  -- repeats the values:-<
 +--------------------------+
 | L5                       |
 +==========================+
-|                      118 |
-|                      118 |
+|                      128 |
+|                      128 |
 +--------------------------+
 2 tuples
 #+END_SRC
@@ -87,10 +92,9 @@ For the last example, a better approach would be to use [[https://www.monetdb.or
 
 
 #+BEGIN_SRC sql :engine monetdb :cmdline "-d testt -e" :results both org :exports results
-drop function set_random_seed;
-create function set_random_seed(seed integer)
+create or replace function set_random_seed(seed integer)
   returns boolean language r { set.seed(seed); TRUE };
-create function rpois2(n integer, mu double)
+create or replace function rpois2(n integer, mu double)
   returns table(y integer) language r {data.frame(y=rpois(n,mu))};
 select set_random_seed(10);
 select * from rpois2(5,10);
@@ -98,10 +102,11 @@ select * from rpois2(5,10);
 
 #+RESULTS:
 #+BEGIN_SRC org
-drop function set_random_seed;
-operation successful
-create function set_random_seed(seed integer)
+create or replace function set_random_seed(seed integer)
   returns boolean language r { set.seed(seed); TRUE };
+operation successful
+create or replace function rpois2(n integer, mu double)
+  returns table(y integer) language r {data.frame(y=rpois(n,mu))};
 operation successful
 select set_random_seed(10);
 +-------+
