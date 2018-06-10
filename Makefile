@@ -36,7 +36,7 @@ install: lib_rmath.so rmath.mal 74_rmath.sql
 	cp 74_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp 74_rmath.mal $(DESTDIR)$(LIBDIR)/monetdb5/autoload
 
-remove:
+uninstall:
 	rm $(DESTDIR)$(LIBDIR)/monetdb5/rmath.mal || true
 	rm $(DESTDIR)$(LIBDIR)/monetdb5/lib_rmath.so || true
 	rm $(DESTDIR)$(LIBDIR)/monetdb5/createdb/74_rmath.sql || true
