@@ -1,0 +1,165 @@
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/htmlize.css"/>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="http://www.pirilampo.org/styles/readtheorg/css/readtheorg.css"/>
+
+#+HTML_HEAD: <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+#+HTML_HEAD: <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="http://www.pirilampo.org/styles/lib/js/jquery.stickytableheaders.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="http://www.pirilampo.org/styles/readtheorg/js/readtheorg.js"></script>
+#+HTML_HEAD: <style type="text/css">.abstract {max-width: 30em; margin-left: auto; margin-right: auto;}</style>
+
+#+OPTIONS: H:3 num:nil toc:nil html-postamble:nil
+
+#+title: MonetDB-rmath: MonetDB extension to use the Rmath library.
+
+#+BEGIN_SRC emacs-lisp :exports none :results none
+;; (cd "/home/marcle/src/database/MonetDB-rmath")
+(shell-command "monetdbd start ~/work/mydbfarm || true")
+#+END_SRC
+
+
+An early version for MonetDB-rmath is now available. It includes approximately 90% of the functions in [[http://docs.rexamine.com/R-devel/Rmath_8h_source.html][Rmath.h]], including [rpdq] (norm|unif|gamma|beta|lnorm|chisq|nchisq|f|t|binom|cauchy|exp|geom|hyper|nbinom|pois|weibull|logis|wilcox|signrank) and another 65 functions. The current implementation uses [[https://www.gnu.org/software/m4/m4.html][m4]] for code generation and requires the r-mathlib package under Debian.
+
+One can clone the GitHub repository and install using:
+#+BEGIN_SRC bash :eval no
+git clone https://github.com/mclements/MonetDB-rmath.git
+cd MonetDB-rmath
+make
+sudo make install
+#+END_SRC
+
+You will then need to use a fresh database. An example script is:
+#+BEGIN_SRC sql :engine monetdb :cmdline "-d testt -e" :results both org :exports results
+-- calculate the quantile and cumulative distribution function for a unit normals
+select qnorm(0.025,0,1), pnorm(-1.96,0,1);
+-- calculate E(Z^2) for Z~Normal(0,1)
+select sum(R_pow(value,2)*0.01*dnorm(value,0,1)) from
+  sys.generate_series(-5.0,5.0,0.01);
+-- random numbers
+select set_seed(1,2);
+select rpois(value*0+100) from sys.generate_series(1,10); -- ok
+select rpois(100) from sys.generate_series(1,3);  -- repeats the values:-<
+#+end_src
+
+#+RESULTS:
+#+BEGIN_SRC org
+select qnorm(0.025,0,1), pnorm(-1.96,0,1);
++--------------------------+--------------------------+
+| L2                       | L4                       |
++==========================+==========================+
+|      -1.9599639845400538 |     0.024997895148220428 |
++--------------------------+--------------------------+
+1 tuple
+select sum(R_pow(value,2)*0.01*dnorm(value,0,1)) from
+  sys.generate_series(-5.0,5.0,0.01);
++--------------------------+
+| L7                       |
++==========================+
+|       0.9999845566522483 |
++--------------------------+
+1 tuple
+select rpois(value*0+100) from sys.generate_series(1,10); -- ok
++--------------------------+
+| L5                       |
++==========================+
+|                      103 |
+|                      100 |
+|                       92 |
+|                       99 |
+|                      102 |
+|                      101 |
+|                      106 |
+|                      103 |
+|                       99 |
++--------------------------+
+9 tuples
+select rpois(100) from sys.generate_series(1,3);  -- repeats the values:-<
++--------------------------+
+| L5                       |
++==========================+
+|                      118 |
+|                      118 |
++--------------------------+
+2 tuples
+#+END_SRC
+
+
+For the last example, a better approach would be to use [[https://www.monetdb.org/content/embedded-r-monetdb][embedded R]]. Continuing the example:
+
+
+#+BEGIN_SRC sql :engine monetdb :cmdline "-d testt -e" :results both org :exports results
+drop function set_random_seed;
+create function set_random_seed(seed integer)
+  returns boolean language r { set.seed(seed); TRUE };
+create function rpois2(n integer, mu double)
+  returns table(y integer) language r {data.frame(y=rpois(n,mu))};
+select set_random_seed(10);
+select * from rpois2(5,10);
+#+end_src 
+
+#+RESULTS:
+#+BEGIN_SRC org
+drop function set_random_seed;
+operation successful
+create function set_random_seed(seed integer)
+  returns boolean language r { set.seed(seed); TRUE };
+operation successful
+select set_random_seed(10);
++-------+
+| L2    |
++=======+
+| true  |
++-------+
+1 tuple
+select * from rpois2(5,10);
++------+
+| y    |
++======+
+|   10 |
+|    9 |
+|    5 |
+|    8 |
+|    9 |
++------+
+5 tuples
+#+END_SRC
+
+
+The functions allow for arguments that are scalars and BATs. Combinations of BATs and scalars are also supported when the BATs are the earlier arguments. The next step is to add further statistical tests. As examples, I have included: =rmath_poisson_ci(y,boundary)= for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%; and `poisson_test(y,t)` for count y and time exposed t, with the default null hypothesis that y/t=1:
+
+#+BEGIN_SRC sql :engine monetdb :cmdline "-d testt" :results both org :exports both
+select 10.0/9 as rate_ratio, rmath_poisson_ci(10,1)/9 as lci, rmath_poisson_ci(10,2)/9 as uci, rmath_poisson_test(10,9) as pvalue;
+#+end_src
+
+#+RESULTS:
+#+BEGIN_SRC org
++------------+--------------------------+--------------------------+--------------------------+
+| rate_ratio | lci                      | uci                      | pvalue                   |
++============+==========================+==========================+==========================+
+|      1.111 |       0.5328209662369371 |       2.0433728935575304 |       0.7364887199809547 |
++------------+--------------------------+--------------------------+--------------------------+
+1 tuple
+#+END_SRC
+
+The equivalent R would be:
+
+#+BEGIN_SRC R :results output org :exports both
+poisson.test(10,9)
+#+END_SRC
+
+#+RESULTS:
+#+BEGIN_SRC org
+
+	Exact Poisson test
+
+data:  10 time base: 9
+number of events = 10, time base = 9, p-value = 0.7365
+alternative hypothesis: true event rate is not equal to 1
+95 percent confidence interval:
+ 0.532821 2.043373
+sample estimates:
+event rate 
+  1.111111 
+
+#+END_SRC
+
+
