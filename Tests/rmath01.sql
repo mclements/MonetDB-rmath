@@ -1,5 +1,6 @@
 -- (async-shell-command "monetdbd start ~/work/mydbfarm")
 -- (sql-monetdb)
+-- (setf sql-buffer "*SQL*")
 
 SELECT sys.pchisq(20.0, 5.0);
 
@@ -80,36 +81,31 @@ select 10 as n, poissonci(10,1) as lower, poissonci(10,2) as upper
 union all
 select 0, poissonci(0,1), poissonci(0,2);
 
+-- (sql-monetdb)
 -- scalar function using R
-drop function poisson_ci2(double,integer);
-create function poisson_ci2(y double,boundary integer) returns double language r {sapply(y,function(yi) poisson.test(yi)$conf.int[boundary])};
+create or replace function poisson_ci2(y double,boundary integer) returns double language r {mapply(function(yi,bi) poisson.test(yi)$conf.int[bi], y, boundary)};
 -- table returning function using R
-drop function poisson_ci3(double);
-create function poisson_ci3(y double) returns table (lci double, uci double) language r {val = t(sapply(y,function(yi) {test = poisson.test(yi)})); data.frame(lci=val[,1],uci=val[,2])};
+create or replace function poisson_ci3(y double) returns table (lci double, uci double) language r {val = t(sapply(y,function(yi) {test = poisson.test(yi)$conf.int})); data.frame(lci=val[,1],uci=val[,2])};
 -- table returning function using C code
-drop function poisson_ci4(double);
-create function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select poisson_ci(y,1) as lci, poisson_ci(y,2) as uci); end;
+create or replace function poisson_ci4(y double) returns table (lci double, uci double) begin return table(select rmath_poisson_ci(y,1) as lci, rmath_poisson_ci(y,2) as uci); end;
 -- vectorised R code
-drop function poisson_ci5(double);
-create function poisson_ci5(y double) returns table (lci double, uci double) language r {alpha=0.025; data.frame(lci=ifelse(y==0,0,qgamma(alpha,y)), uci=qgamma(1-alpha,y+1))};
+create or replace function poisson_ci5(y double) returns table (lci double, uci double) language r {alpha=0.025; data.frame(lci=ifelse(y==0,0,qgamma(alpha,y)), uci=qgamma(1-alpha,y+1))};
 --
-drop function poisson_test2(double,double);
-create function poisson_test2(y double,e double) returns double language r {mapply(function(yi,ei) poisson.test(yi,ei)$p.value,y,e)};
-drop function poisson_test3(double,double);
-create function poisson_test3(y double,e double) returns table(lci double, uci double, pvalue double) language r {data.frame(t(mapply(function(yi,ei) {test=poisson.test(yi,ei); c(lci=test$conf.int[1], uci=test$conf.int[2], pvalue=test$p.value)},y,e)))};
-select poisson_test3(10,12).*;
+create or replace function poisson_test2(y double,e double) returns double language r {mapply(function(yi,ei) poisson.test(yi,ei)$p.value,y,e)};
+create or replace function poisson_test3(y double,e double) returns table(lci double, uci double, pvalue double) language r {data.frame(t(mapply(function(yi,ei) {test=poisson.test(yi,ei); c(lci=test$conf.int[1], uci=test$conf.int[2], pvalue=test$p.value)},y,e)))};
+--select poisson_test3(10,12).*;
 
 \t clock
 drop table vals;
-create table vals as select cast(value as double) as value, cast(value as double)*1.1 as value2, 1.0 as r, 2 as alt, 1 as one, cast(0.95 as double) as conflevel  from generate_series(1.0,10001.0,1.0);
-select sum(lci), sum(uci) from (select poisson_ci(value,1) as lci, poisson_ci(value,2) as uci from vals) as t; -- 28ms FASTEST (slightly faster than vectorised R)
+create table vals as select cast(value as double) as value, cast(value as double)*1.1 as value2, 1.0 as r, 2 as alt, 1 as one, 2 as two, cast(0.95 as double) as conflevel  from generate_series(1.0,101.0,1.0);
+select sum(lci), sum(uci) from (select rmath_poisson_ci(value,1) as lci, rmath_poisson_ci(value,2) as uci from vals) as t; -- 28ms FASTEST (slightly faster than vectorised R)
 select sum(poisson_ci2(value,1)), sum(poisson_ci2(value,2)) from vals; -- 1.6s
 select sum(lci), sum(uci) from poisson_ci3((select value from vals)); -- 790ms
 select sum(lci), sum(uci) from poisson_ci4((select value from vals)); -- 1.1s?? SLOW
 select sum(lci), sum(uci) from poisson_ci5((select value from vals)); -- 40ms FAST
 select sum(lci), sum(uci) from vals, lateral poisson_ci4(vals.value) as t2; -- 1.3s SLOW (lateral)
 --
-select sum(poisson_test(value,value2)) from vals; -- 5.6s
+select sum(rmath_poisson_test(value,value2)) from vals; -- 5.6s
 select sum(pvalue) from poisson_test3((select value,value2 from vals)); -- 8.8s
 
 explain select sum(poisson_ci(value,1)) from generate_series(1,10);
