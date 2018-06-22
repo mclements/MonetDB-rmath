@@ -9,104 +9,105 @@
 
 divert(`-1')
 define(`DIST1FUNCTION',`-- $1 distribution
-create function sys.p$2(q double, $3 double, lower integer, log integer)
+create function rmath.p$2(q double, $3 double, lower integer, log integer)
 returns double external name rmath."p$2";
 
-create function sys.p$2(q double, $3 double)
+create function rmath.p$2(q double, $3 double)
 returns double begin return p$2(q, $3, 1, 0); end;
 
-create function sys.q$2(p double, $3 double, lower integer, log integer)
+create function rmath.q$2(p double, $3 double, lower integer, log integer)
 returns double external name rmath."q$2";
 
-create function sys.q$2(p double, $3 double)
+create function rmath.q$2(p double, $3 double)
 returns double begin return q$2(p, $3, 1, 0); end;
 
-create function sys.d$2(x double, $3 double, log integer)
+create function rmath.d$2(x double, $3 double, log integer)
 returns double external name rmath."d$2";
 
-create function sys.d$2(x double, $3 double)
+create function rmath.d$2(x double, $3 double)
 returns double begin return d$2(x, $3, 0); end;
 
-create function sys.r$2($3 double)
+create function rmath.r$2($3 double)
 returns double external name rmath."r$2";
 ')
 
 define(`DIST2FUNCTION',`-- $1 distribution
-create function sys.p$2(q double, $3 double, $4 double, lower integer, log integer)
+create function rmath.p$2(q double, $3 double, $4 double, lower integer, log integer)
 returns double external name rmath."p$2";
 
-create function sys.p$2(q double, $3 double, $4 double)
+create function rmath.p$2(q double, $3 double, $4 double)
 returns double begin return p$2(q, $3, $4, 1, 0); end;
 
-create function sys.q$2(p double, $3 double, $4 double, lower integer, log integer)
+create function rmath.q$2(p double, $3 double, $4 double, lower integer, log integer)
 returns double external name rmath."q$2";
 
-create function sys.q$2(p double, $3 double, $4 double)
+create function rmath.q$2(p double, $3 double, $4 double)
 returns double begin return q$2(p, $3, $4, 1, 0); end;
 
-create function sys.d$2(x double, $3 double, $4 double, log integer)
+create function rmath.d$2(x double, $3 double, $4 double, log integer)
 returns double external name rmath."d$2";
 
-create function sys.d$2(x double, $3 double, $4 double)
+create function rmath.d$2(x double, $3 double, $4 double)
 returns double begin return d$2(x, $3, $4, 0); end;
 
-create function sys.r$2($3 double, $4 double)
+create function rmath.r$2($3 double, $4 double)
 returns double external name rmath."r$2";
 ')
 
 define(`DIST3FUNCTION',`-- $1 distribution
-create function sys.p$2(q double, $3 double, $4 double, $5 double, lower integer, log integer)
+create function rmath.p$2(q double, $3 double, $4 double, $5 double, lower integer, log integer)
 returns double external name rmath."p$2";
 
-create function sys.p$2(q double, $3 double, $4 double, $5 double)
+create function rmath.p$2(q double, $3 double, $4 double, $5 double)
 returns double begin return p$2(q, $3, $4, $5, 1, 0); end;
 
-create function sys.q$2(p double, $3 double, $4 double, $5 double, lower integer, log integer)
+create function rmath.q$2(p double, $3 double, $4 double, $5 double, lower integer, log integer)
 returns double external name rmath."q$2";
 
-create function sys.q$2(p double, $3 double, $4 double, $5 double)
+create function rmath.q$2(p double, $3 double, $4 double, $5 double)
 returns double begin return q$2(p, $3, $4, $5, 1, 0); end;
 
-create function sys.d$2(x double, $3 double, $4 double, $5 double, log integer)
+create function rmath.d$2(x double, $3 double, $4 double, $5 double, log integer)
 returns double external name rmath."d$2";
 
-create function sys.d$2(x double, $3 double, $4 double, $5 double)
+create function rmath.d$2(x double, $3 double, $4 double, $5 double)
 returns double begin return d$2(x, $3, $4, $5, 0); end;
 
-create function sys.r$2($3 double, $4 double, $5 double)
+create function rmath.r$2($3 double, $4 double, $5 double)
 returns double external name rmath."r$2";
 ')
 
 define(`FUNCTION0',`-- $1
-create function sys.$2()
+create function rmath.$2()
 returns double external name rmath."$2";
 ')
 define(`FUNCTION1',`-- $1
-create function sys.$2($4 $3)
+create function rmath.$2($4 $3)
 returns double external name rmath."$2";
 ')
 define(`FUNCTION2',`-- $1
-create function sys.$2($4 $3, $6 $5)
+create function rmath.$2($4 $3, $6 $5)
 returns double external name rmath."$2";
 ')
 define(`FUNCTION3',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7)
+create function rmath.$2($4 $3, $6 $5, $8 $7)
 returns double external name rmath."$2";
 ')
 define(`FUNCTION4',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9)
+create function rmath.$2($4 $3, $6 $5, $8 $7, $10 $9)
 returns double external name rmath."$2";
 ')
 define(`FUNCTION5',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
+create function rmath.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
 returns double external name rmath."$2";
 ')
 define(`FUNCTION6',`-- $1
-create function sys.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
+create function rmath.$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
 returns double external name rmath."$2";
 ')
 
 divert(`1')
+create schema rmath;
 
 FUNCTION0(e,M_E)
 FUNCTION0(log2(e),M_LOG2E)
@@ -138,7 +139,7 @@ FUNCTION0(Normal random numbers,norm_rand)
 FUNCTION0(Uniform random numbers,unif_rand)
 FUNCTION0(Exponential random numbers,exp_rand)
 
-create function sys.set_seed(a integer, b integer)
+create function rmath.set_seed(a integer, b integer)
 returns double external name rmath."set_seed";
 
 -- void	get_seed(unsigned int *, unsigned int *);
@@ -243,31 +244,31 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- rmath_export int N01_kind;
 
 FUNCTION3(Exact Poisson confidence interval,rmath_poisson_ci,double,x,integer,boundary,double,conflevel)
-create function sys.rmath_poisson_ci(x double, boundary integer)
-returns double begin return sys.rmath_poisson_ci(x,boundary,0.95); end;
+create function rmath.rmath_poisson_ci(x double, boundary integer)
+returns double begin return rmath.rmath_poisson_ci(x,boundary,0.95); end;
 
-create function sys.rmath_poisson_cis(x double, conflevel double)
+create function rmath.rmath_poisson_cis(x double, conflevel double)
 returns table(lci double, uci double)
 external name rmath."rmath_poisson_cis";
 
-create function sys.rmath_poisson_cis2(x double, conflevel double)
+create function rmath.rmath_poisson_cis2(x double, conflevel double)
 returns table(lci double, uci double)
 external name rmath."rmath_poisson_cis2";
 
 -- deprecated call
-create function sys.poissonci(x double, boundary integer, conflevel double)
-returns double begin return sys.rmath_poisson_ci(x,boundary,conflevel); end;
+create function rmath.poissonci(x double, boundary integer, conflevel double)
+returns double begin return rmath.rmath_poisson_ci(x,boundary,conflevel); end;
 
 -- deprecated call
-create function sys.poissonci(x double, boundary integer)
-returns double begin return sys.rmath_poisson_ci(x,boundary,0.95); end;
+create function rmath.poissonci(x double, boundary integer)
+returns double begin return rmath.rmath_poisson_ci(x,boundary,0.95); end;
 
 -- alternative: 0=left, 1=right, 2=two-sided
 FUNCTION4(Poisson test,rmath_poisson_test,double,x,double,t,double,r,int,alternative);
 
-create function sys.rmath_poisson_test(x double, t double, r double)
-returns double begin return sys.rmath_poisson_test(x,t,r,2); end;
+create function rmath.rmath_poisson_test(x double, t double, r double)
+returns double begin return rmath.rmath_poisson_test(x,t,r,2); end;
 
-create function sys.rmath_poisson_test(x double, t double)
-returns double begin return sys.rmath_poisson_test(x,t,1.0,2); end;
+create function rmath.rmath_poisson_test(x double, t double)
+returns double begin return rmath.rmath_poisson_test(x,t,1.0,2); end;
 
