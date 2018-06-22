@@ -62,4 +62,4 @@ test:
 	monetdb release testt
 	monetdb set embedr=yes testt
 	monetdb set embedc=yes testt
-	mclient -d testt -s "select r_pnorm(1.96, 0, 1); create table temp (x double); insert into temp values (0.1); insert into temp values (0.2); select r_qgamma(x,2.0,1.0,1,0), r_qgamma(x*2,2,1) from temp;"
+	mclient -d testt -s "select rmath.r_pnorm(1.96, 0, 1); create table temp (x double); insert into temp values (0.1); insert into temp values (0.2); select rmath.r_qgamma(x,2.0,1.0,1,0), rmath.r_qgamma(x*2,2,1) from temp;"

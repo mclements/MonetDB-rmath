@@ -13,9 +13,9 @@ FUNCTION4($1 cumulative density function,p$2,double,q,double,$3,integer,lower,in
 FUNCTION4($1 quantile function,q$2,double,p,double,$3,integer,lower,integer,log)
 FUNCTION3($1 probability density function,d$2,double,p,double,$3,integer,log)
 FUNCTION1($1 random numbers,r$2,double,$3)
-create function sys.r_p$2(q double, $3 double) returns double begin return sys.r_p$2(q, $3, 1, 0); end;
-create function sys.r_q$2(p double, $3 double) returns double begin return sys.r_q$2(p, $3, 1, 0); end;
-create function sys.r_d$2(x double, $3 double) returns double begin return sys.r_d$2(x, $3, 0); end;
+create function rmath.r_p$2(q double, $3 double) returns double begin return rmath.r_p$2(q, $3, 1, 0); end;
+create function rmath.r_q$2(p double, $3 double) returns double begin return rmath.r_q$2(p, $3, 1, 0); end;
+create function rmath.r_d$2(x double, $3 double) returns double begin return rmath.r_d$2(x, $3, 0); end;
 ')
 
 define(`DIST2FUNCTION',`-- $1 distribution
@@ -23,9 +23,9 @@ FUNCTION5($1 cumulative density function,p$2,double,q,double,$3,double,$4,intege
 FUNCTION5($1 quantile function,q$2,double,p,double,$3,double,$4,integer,lower,integer,log)
 FUNCTION4($1 probability density function,d$2,double,p,double,$3,double,$4,integer,log)
 FUNCTION2($1 random numbers,r$2,double,$3,double,$4)
-create function sys.r_p$2(q double, $3 double, $4 double) returns double begin return sys.r_p$2(q, $3, $4, 1, 0); end;
-create function sys.r_q$2(p double, $3 double, $4 double) returns double begin return sys.r_q$2(p, $3, $4, 1, 0); end;
-create function sys.r_d$2(x double, $3 double, $4 double) returns double begin return sys.r_d$2(x, $3, $4, 0); end;
+create function rmath.r_p$2(q double, $3 double, $4 double) returns double begin return rmath.r_p$2(q, $3, $4, 1, 0); end;
+create function rmath.r_q$2(p double, $3 double, $4 double) returns double begin return rmath.r_q$2(p, $3, $4, 1, 0); end;
+create function rmath.r_d$2(x double, $3 double, $4 double) returns double begin return rmath.r_d$2(x, $3, $4, 0); end;
 ')
 
 define(`DIST3FUNCTION',`-- $1 distribution
@@ -33,13 +33,13 @@ FUNCTION6($1 cumulative density function,p$2,double,q,double,$3,double,$4,double
 FUNCTION6($1 quantile function,q$2,double,p,double,$3,double,$4,double,$5,integer,lower,integer,log)
 FUNCTION5($1 probability density function,d$2,double,p,double,$3,double,$4,double,$5,integer,log)
 FUNCTION3($1 random numbers,r$2,double,$3,double,$4,double,$5)
-create function sys.r_p$2(q double, $3 double, $4 double, $5 double) returns double begin return sys.r_p$2(q, $3, $4, $5, 1, 0); end;
-create function sys.r_q$2(p double, $3 double, $4 double, $5 double) returns double begin return sys.r_q$2(p, $3, $4, $5, 1, 0); end;
-create function sys.r_d$2(x double, $3 double, $4 double, $5 double) returns double begin return sys.r_d$2(x, $3, $4, $5, 0); end;
+create function rmath.r_p$2(q double, $3 double, $4 double, $5 double) returns double begin return rmath.r_p$2(q, $3, $4, $5, 1, 0); end;
+create function rmath.r_q$2(p double, $3 double, $4 double, $5 double) returns double begin return rmath.r_q$2(p, $3, $4, $5, 1, 0); end;
+create function rmath.r_d$2(x double, $3 double, $4 double, $5 double) returns double begin return rmath.r_d$2(x, $3, $4, $5, 0); end;
 ')
 
 define(`FUNCTION0',`-- $1
-create function sys.r_$2()
+create function rmath.r_$2()
 returns double
 language c {
 #include "rmath_ext.h"
@@ -50,7 +50,7 @@ language c {
 };
 ')
 define(`FUNCTION1',`-- $1
-create function sys.r_$2($4 $3)
+create function rmath.r_$2($4 $3)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -67,7 +67,7 @@ language c {
 };
 ')
 define(`FUNCTION2',`-- $1
-create function sys.r_$2($4 $3, $6 $5)
+create function rmath.r_$2($4 $3, $6 $5)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -87,7 +87,7 @@ language c {
 };
 ')
 define(`FUNCTION3',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -109,7 +109,7 @@ language c {
 };
 ')
 define(`FUNCTION4',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -133,7 +133,7 @@ language c {
 };
 ')
 define(`FUNCTION5',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -159,7 +159,7 @@ language c {
 };
 ')
 define(`FUNCTION6',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -190,7 +190,7 @@ language c {
 # anonymous functions using a,b,c,... as variables that are substituted, with a double variable res
 
 define(`FUNCTION1F',`-- $1
-create function sys.r_$2($4 $3)
+create function rmath.r_$2($4 $3)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -210,7 +210,7 @@ language c {
 };
 ')
 define(`FUNCTION2F',`-- $1
-create function sys.r_$2($4 $3, $6 $5)
+create function rmath.r_$2($4 $3, $6 $5)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -234,7 +234,7 @@ language c {
 };
 ')
 define(`FUNCTION3F',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -261,7 +261,7 @@ language c {
 };
 ')
 define(`FUNCTION4F',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7, $10 $9)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -291,7 +291,7 @@ language c {
 };
 ')
 define(`FUNCTION5F',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -324,7 +324,7 @@ language c {
 };
 ')
 define(`FUNCTION6F',`-- $1
-create function sys.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
+create function rmath.r_$2($4 $3, $6 $5, $8 $7, $10 $9, $12 $11, $14 $13)
 returns double 
 language c {
 #include "rmath_ext.h"
@@ -361,6 +361,7 @@ language c {
 ')
 
 divert(`1')
+create schema rmath;
 
 FUNCTION0(e,M_E)
 FUNCTION0(log2(e),M_LOG2E)
@@ -496,33 +497,33 @@ FUNCTION1(ftrunc,ftrunc,double,x)
 -- rmath_export double R_NegInf;
 -- rmath_export int N01_kind;
 
--- create function sys.poisson_cis(x double, conflevel double)
+-- create function rmath.poisson_cis(x double, conflevel double)
 -- returns table(lci double, uci double)
--- external name sys."poisson_cis";
+-- external name rmath."poisson_cis";
 
--- create function sys.poisson_cis2(x double, conflevel double)
+-- create function rmath.poisson_cis2(x double, conflevel double)
 -- returns table(lci double, uci double)
--- external name sys."poisson_cis2";
+-- external name rmath."poisson_cis2";
 
 -- alternative: 0=left, 1=right, 2=two-sided
 FUNCTION4(Poisson test,poisson_test,double,x,double,t,double,r,int,alternative)
 
-create function sys.r_poisson_test(x double, t double, r double)
-returns double begin return sys.r_poisson_test(x,t,r,2); end;
+create function rmath.r_poisson_test(x double, t double, r double)
+returns double begin return rmath.r_poisson_test(x,t,r,2); end;
 
-create function sys.r_poisson_test(x double, t double)
-returns double begin return sys.r_poisson_test(x,t,1.0,2); end;
+create function rmath.r_poisson_test(x double, t double)
+returns double begin return rmath.r_poisson_test(x,t,1.0,2); end;
 
 FUNCTION3(Exact Poisson confidence interval,poisson_ci,double,x,integer,boundary,double,conflevel)
 
-create function sys.r_poisson_ci(x double, boundary integer)
-returns double begin return sys.r_poisson_ci(x,boundary,0.95); end;
+create function rmath.r_poisson_ci(x double, boundary integer)
+returns double begin return rmath.r_poisson_ci(x,boundary,0.95); end;
 
 -- deprecated call
-create function sys.poissonci(x double, boundary integer, conflevel double)
-returns double begin return sys.r_poisson_ci(x,boundary,conflevel); end;
+create function rmath.poissonci(x double, boundary integer, conflevel double)
+returns double begin return rmath.r_poisson_ci(x,boundary,conflevel); end;
 
 -- deprecated call
-create function sys.poissonci(x double, boundary integer)
-returns double begin return sys.r_poisson_ci(x,boundary,0.95); end;
+create function rmath.poissonci(x double, boundary integer)
+returns double begin return rmath.r_poisson_ci(x,boundary,0.95); end;
 	   
