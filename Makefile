@@ -38,6 +38,11 @@ install: lib_rmath.so 74_rmath.sql
 	cp 74_rmath.sql $(DESTDIR)$(LIBDIR)/monetdb5/createdb
 	cp rmath_ext.h $(MONETDBINCLUDE)
 
+uninstall:
+	rm $(DESTDIR)$(LIBDIR)/monetdb5/lib_rmath.so || true
+	rm $(DESTDIR)$(LIBDIR)/monetdb5/createdb/74_rmath.sql || true
+	rm $(MONETDBINCLUDE)/rmath_ext.h || true
+
 dist:
 	tar -c -j -f $(name)-$(version).tar.bz2 --transform "s,^,$(name)-$(version)/," `hg files -X .hgtags`
 
