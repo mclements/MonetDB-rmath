@@ -129,7 +129,7 @@ select * from rpois2(5,10);
 #+END_SRC
 
 
-The functions allow for arguments that are scalars and BATs. Combinations of BATs and scalars are also supported when the BATs are the earlier arguments. The next step is to add further statistical tests. As examples, I have included: =rmath_poisson_ci(y,boundary)= for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%; and `poisson_test(y,t)` for count y and time exposed t, with the default null hypothesis that y/t=1:
+The functions allow for arguments that are scalars and BATs. Combinations of BATs and scalars are also supported when the BATs are the earlier arguments. The next step is to add further statistical tests. As examples, I have included: =rmath_poisson_ci(y,boundary)= for an exact Poisson confidence interval for count y for a specific boundary (1=left, 2=right) with default confidence level of 95%; and =rmath_poisson_test(y,t)= for count y and time exposed t, with the default null hypothesis that y/t=1:
 
 #+BEGIN_SRC sql :engine monetdb :cmdline "-d testt" :results both org :exports both
 select 10.0/9 as rate_ratio, rmath_poisson_ci(10,1)/9 as lci, rmath_poisson_ci(10,2)/9 as uci, rmath_poisson_test(10,9) as pvalue;
