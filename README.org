@@ -24,12 +24,13 @@ An early version for MonetDB-rmath is now available. It includes approximately 9
 
 As a breaking change, the functions are now in the =rmath= schema. This will prevent cluttering the =sys= schema.
 
-* Quick installation
+* Quick installation of the JIT library
 
 One can clone the GitHub repository and install using:
 #+BEGIN_SRC bash :eval no
 git clone https://github.com/mclements/MonetDB-rmath.git
 cd MonetDB-rmath
+git checkout jit
 make
 sudo make install
 #+END_SRC
